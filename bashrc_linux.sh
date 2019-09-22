@@ -28,8 +28,8 @@ alias vglresolve="vglrun -d :1 /opt/resolve/bin/resolve"
 alias vgltest="vglrun -d :1 /opt/VirtualGL/bin/glxspheres64"
 
 # cuda
-export LD_LIBRARY_PATH=/usr/local/cuda/lib64:\$LD_LIBRARY_PATH
-export PATH=/usr/local/cuda/bin:\$PATH
+# export LD_LIBRARY_PATH=/usr/local/cuda/lib64:\$LD_LIBRARY_PATH
+# export PATH=/usr/local/cuda/bin:\$PATH
 
 # wireguard
 alias wg-up="wg-quick up /etc/wireguard/wg0.conf"
