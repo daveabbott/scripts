@@ -169,6 +169,48 @@ then
 
 	mkdir -p /github/ && cd $_
 	git clone https://github.com/vinceliuice/Tela-icon-theme.git
+
+# shrink ridiculouly oversized title bar in gnome
+cat > ~/.config/gtk-3.0/gtk.css << EOF
+headerbar {
+    min-height: 0px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+headerbar entry,
+headerbar spinbutton,
+headerbar button,
+headerbar separator {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+/* shrink ssd titlebars */
+.default-decoration {
+    min-height: 0;
+    padding: 3px;
+}
+
+.default-decoration .titlebutton {
+    min-height: 0px;
+    min-width: 0px;
+}
+
+window.ssd headerbar.titlebar {
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    min-height: 0;
+}
+
+window.ssd headerbar.titlebar button.titlebutton {
+    padding-top: 3px;
+    padding-bottom:3px;
+    min-height: 0;
+}
+EOF
 fi
 
 read -p "Install Snaps? " -n 1 -r
