@@ -21,23 +21,16 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
-	yum-config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
+	dnf config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
 
 	rpm --import https://www.virtualgl.org/key/VGL-GPG-KEY
-	yum-config-manager --add-repo=https://virtualgl.org/pmwiki/uploads/Downloads/VirtualGL.repo
+	dnf config-manager --add-repo=https://virtualgl.org/pmwiki/uploads/Downloads/VirtualGL.repo
 
-	yum-config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
+	dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
+
+	dnf config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/fedora29/x86_64/cuda-fedora29.repo
 
 	curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
-
-cat > /etc/yum.repos.d/cuda.repo << EOF
-[cuda]
-name=cuda
-baseurl=http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64
-enabled=1
-gpgcheck=1
-gpgkey=http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/7fa2af80.pub
-EOF
 
 cat > /etc/yum.repos.d/epel-multimedia.repo << EOF
 [epel-multimedia]
@@ -163,10 +156,12 @@ then
 	echo "sudo /mnt/kabbalah/library/Software/Linux/Foundry/Nuke/Nuke10.5v4-linux-x86-release-64-installer" >> /home/davidabbott/Desktop/INSTALL.txt
 fi
 
-read -p "Install Nvidia Drivers? " -n 1 -r
+read -p "Install Nvidia? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
+	dnf clean all
+	dnf -y install cuda
 	systemctl isolate multi-user.target
 	bash /mnt/kabbalah/library/Software/Linux/Nvidia/NVIDIA-Linux-x86_64-*.run
 fi
