@@ -48,6 +48,9 @@ flush "/Volumes/RAID_SSD/SCRATCH/nuke/ViewerCache"
 flush "/Volumes/RAID_SSD/SCRATCH/nuke/tileCache"
 flush "/Volumes/RAID_SSD/SCRATCH/nuke/flipbook"
 flush "/Volumes/RAID_SSD/SCRATCH/nuke/ofxplugincache"
+	## LINUX
+flush "/var/tmp/nuke-u1000"
+
 
 echo
 echo RESOLVE
