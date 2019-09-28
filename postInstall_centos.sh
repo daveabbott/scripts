@@ -34,16 +34,9 @@ then
 
 	yum-config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo
 
-	curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
+	yum-config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo
 
-cat > /etc/yum.repos.d/cuda.repo << EOF
-[cuda]
-name=cuda
-baseurl=http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64
-enabled=1
-gpgcheck=1
-gpgkey=http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/7fa2af80.pub
-EOF
+	curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
 
 cat > /etc/yum.repos.d/epel-multimedia.repo << EOF
 [epel-multimedia]
@@ -79,11 +72,10 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	yum groupinstall -y "X Window System"
 	yum install -y gnome-classic-session gnome-terminal gnome-tweak-tool gnome-disk-utility nautilus-open-terminal control-center
-	yum install -y lightdm
 	systemctl disable gdm
 	unlink /etc/systemd/system/default.target
 	ln -sf /lib/systemd/system/graphical.target /etc/systemd/system/default.target
-	systemctl enable lightdm
+	systemctl enable gdm
 fi
 
 read -p "Install Fonts? " -n 1 -r
@@ -259,10 +251,11 @@ then
 	echo "sudo /mnt/kabbalah/library/Software/Linux/Foundry/Nuke/Nuke10.5v4-linux-x86-release-64-installer" > /scripts/install_Nuke.sh
 fi
 
-read -p "Install Nvidia Drivers? " -n 1 -r
+read -p "Install Nvidia? " -n 1 -r
 echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
+	sudo yum -y install nvidia-driver-latest-dkms cuda
 	systemctl isolate multi-user.target
 	bash /mnt/kabbalah/library/Software/Linux/Nvidia/NVIDIA-Linux-x86_64-*.run
 fi
