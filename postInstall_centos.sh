@@ -1,5 +1,21 @@
 #!/bin/sh
 
+OS_VERSION=$(grep VERSION_ID /etc/os-release | tr -d '"')
+ALLOWED_VERSION=VERSION_ID="7"
+
+if [[ $OS_VERSION != $ALLOWED_VERSION ]]
+then
+	echo Incorrect centos version detected.
+	echo Detected: $OS_VERSION
+	echo Script meant for: $ALLOWED_VERSION
+	exho exiting
+	exit 0
+else
+	echo CentOS 7 detected.
+	echo Proceeding...
+	echo
+fi
+
 echo -e "set-hostname: double-rabbi"
 hostnamectl set-hostname double-rabbi
 
