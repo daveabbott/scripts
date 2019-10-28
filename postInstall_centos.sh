@@ -116,6 +116,7 @@ then
 	echo "/mnt/kabbalah /etc/auto.kabbalah --timeout=60" > /etc/auto.master
 
 	echo "active  -fstype=nfs  192.168.69.20:/volume1/Active" > /etc/auto.kabbalah
+	echo "archive  -fstype=nfs  192.168.69.20:/volume1/Archive" >> /etc/auto.kabbalah
 	echo "library  -fstype=nfs  192.168.69.20:/volume1/Library" >> /etc/auto.kabbalah
 	echo "media  -fstype=nfs  192.168.69.20:/volume1/Media" >> /etc/auto.kabbalah
 	echo "temp  -fstype=nfs  192.168.69.20:/volume1/Temp" >> /etc/auto.kabbalah
