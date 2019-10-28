@@ -1,5 +1,21 @@
 #!/bin/sh
 
+OS_VERSION=$(grep VERSION_ID /etc/os-release | tr -d '"')
+ALLOWED_VERSION=VERSION_ID="7"
+
+if [[ $OS_VERSION != $ALLOWED_VERSION ]]
+then
+	echo Incorrect centos version detected.
+	echo Detected: $OS_VERSION
+	echo Script meant for: $ALLOWED_VERSION
+	exho exiting
+	exit 0
+else
+	echo CentOS 7 detected.
+	echo Proceeding...
+	echo
+fi
+
 echo -e "set-hostname: double-rabbi"
 hostnamectl set-hostname double-rabbi
 
@@ -34,16 +50,9 @@ then
 
 	yum-config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo
 
-	curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
+	yum-config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo
 
-cat > /etc/yum.repos.d/cuda.repo << EOF
-[cuda]
-name=cuda
-baseurl=http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64
-enabled=1
-gpgcheck=1
-gpgkey=http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/7fa2af80.pub
-EOF
+	curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
 
 cat > /etc/yum.repos.d/epel-multimedia.repo << EOF
 [epel-multimedia]
@@ -79,11 +88,10 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	yum groupinstall -y "X Window System"
 	yum install -y gnome-classic-session gnome-terminal gnome-tweak-tool gnome-disk-utility nautilus-open-terminal control-center
-	yum install -y lightdm
 	systemctl disable gdm
 	unlink /etc/systemd/system/default.target
 	ln -sf /lib/systemd/system/graphical.target /etc/systemd/system/default.target
-	systemctl enable lightdm
+	systemctl enable gdm
 fi
 
 read -p "Install Fonts? " -n 1 -r
@@ -170,6 +178,48 @@ then
 
 	mkdir -p /github/ && cd $_
 	git clone https://github.com/vinceliuice/Tela-icon-theme.git
+
+# shrink ridiculouly oversized title bar in gnome
+cat > ~/.config/gtk-3.0/gtk.css << EOF
+headerbar {
+    min-height: 0px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+headerbar entry,
+headerbar spinbutton,
+headerbar button,
+headerbar separator {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+/* shrink ssd titlebars */
+.default-decoration {
+    min-height: 0;
+    padding: 3px;
+}
+
+.default-decoration .titlebutton {
+    min-height: 0px;
+    min-width: 0px;
+}
+
+window.ssd headerbar.titlebar {
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    min-height: 0;
+}
+
+window.ssd headerbar.titlebar button.titlebutton {
+    padding-top: 3px;
+    padding-bottom:3px;
+    min-height: 0;
+}
+EOF
 fi
 
 read -p "Install Snaps? " -n 1 -r
@@ -218,10 +268,11 @@ then
 	echo "sudo /mnt/kabbalah/library/Software/Linux/Foundry/Nuke/Nuke10.5v4-linux-x86-release-64-installer" > /scripts/install_Nuke.sh
 fi
 
-read -p "Install Nvidia Drivers? " -n 1 -r
+read -p "Install Nvidia? " -n 1 -r
 echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
+	sudo yum -y install nvidia-driver-latest-dkms cuda
 	systemctl isolate multi-user.target
 	bash /mnt/kabbalah/library/Software/Linux/Nvidia/NVIDIA-Linux-x86_64-*.run
 fi
