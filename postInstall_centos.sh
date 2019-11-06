@@ -156,6 +156,9 @@ then
 	yum install -y wireguard-dkms wireguard-tools
 	yum install -y kmod-hfs kmod-hfsplus hfsplus-tools
 	yum install -y VirtualBox-6.0.x86_64
+	yum install -y qt-x11.x86_64 			# required for Redshift Licencing Tool
+	yum install -y libpng12 				# required for Redshift Licencing Tool
+	yum install -y redhat-lsb-core 			# required for Redshift
 fi
 
 read -p "Install Licences? " -n 1 -r
@@ -266,6 +269,7 @@ then
 	echo "Nuke and Resolve need to be installed from GUI. Check /scripts after reboot."
 	echo "/mnt/kabbalah/library/Software/Linux/Blackmagic/DaVinci_Resolve_Studio_*.run -y" > /scripts/install_Resolve.sh
 	echo "sudo /mnt/kabbalah/library/Software/Linux/Foundry/Nuke/Nuke10.5v4-linux-x86-release-64-installer" > /scripts/install_Nuke.sh
+	echo "sudo /mnt/kabbalah/library/Software/Linux/Redshift/redshift*.run" > /scripts/install_Redshift.sh
 fi
 
 read -p "Install Nvidia? " -n 1 -r
