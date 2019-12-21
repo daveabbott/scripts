@@ -1,13 +1,15 @@
-#!/bin/sh
+apt update
+apt install wget libssl-dev apt-transport-https
 
-apt-get update
+wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+dpkg -i packages-microsoft-prod.deb
 
-apt-get install ssl-dev
-
-ulimit -n 64000
+apt update
+apt install dotnet-runtime-2.2
 
 # Install Deadline
-/deadline/DeadlineRepository-*-linux-x64-installer.run
+/deadline/DeadlineR*.run
+/deadline/DeadlineC*.run
 
 # Run DeadlineRCS
-/opt/Thinkbox/Deadline10/bin/deadlinercs
+dotnet /opt/Thinkbox/Deadline10/bin/deadlinercs.dll
