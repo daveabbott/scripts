@@ -52,6 +52,8 @@ then
 
 	yum-config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo
 
+	yum-config-manager --add-repo=https://negativo17.org/repos/epel-spotify.repo
+
 	curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
 
 cat > /etc/yum.repos.d/epel-multimedia.repo << EOF
@@ -143,6 +145,7 @@ then
 	yum install -y ffmpeg
 	yum install -y libQt5Svg				# I forget what requires this. Maybe Mocha?
 	yum install -y handbrake
+	yum install -y spotify-client
 	yum install -y wine
 	yum install -y nano
 	yum install -y gnome-system-monitor
@@ -158,7 +161,7 @@ then
 	yum install -y kmod-hfs kmod-hfsplus hfsplus-tools
 	yum install -y VirtualBox-6.0.x86_64
 	yum install -y qt-x11.x86_64 			# required for Redshift Licencing Tool
-	yum install -y libpng12 				# required for Redshift Licencing Tool
+	yum install -y libpng12 			# required for Redshift Licencing Tool
 	yum install -y redhat-lsb-core 			# required for Redshift
 fi
 
@@ -240,10 +243,10 @@ then
 	sudo snap install bitwarden
 	sudo snap install blender --classic
 	sudo snap install gimp
-	sudo snap install gitkraken
-	sudo snap install opera
+	#sudo snap install gitkraken
+	#sudo snap install opera
 	sudo snap install slack --classic
-	sudo snap install spotify
+	#sudo snap install spotify
 	sudo snap install sublime-text --classic
 	sudo snap install vlc
 fi
