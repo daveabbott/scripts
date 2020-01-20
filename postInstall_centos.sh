@@ -176,6 +176,23 @@ then
 	echo "HOST 192.168.69.4 any 4101" > $RLM/ethernet.lic
 fi
 
+read -p "Set MIME Types? " -n 1 -r
+echo    # (optional) move to a new line
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+# nuke
+cat > /usr/share/mime/packages/project-nuke-script.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="text/nuke-script">
+    <comment>nuke script</comment>
+    <glob pattern="*.nk"/>
+  </mime-type>
+</mime-info>
+EOF
+fi
+
 read -p "Setup Theme? " -n 1 -r
 echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
