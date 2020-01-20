@@ -185,12 +185,15 @@ cat > /usr/share/mime/packages/project-nuke-script.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-  <mime-type type="text/nuke-script">
+  <mime-type type="application/x-nuke">
     <comment>nuke script</comment>
     <glob pattern="*.nk"/>
   </mime-type>
 </mime-info>
 EOF
+
+# update MIME database
+update-mime-database /usr/share/mime
 fi
 
 read -p "Setup Theme? " -n 1 -r
