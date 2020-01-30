@@ -149,7 +149,8 @@ then
 	yum install -y wine
 	yum install -y nano
 	yum install -y gnome-system-monitor
-	yum install -y eog						# eye of gnome image viewer
+	yum install -y chrome-gnome-shell			# allows firefox to install gnome extensions
+	yum install -y eog					# eye of gnome image viewer
 	yum install -y gnome-tweak-tool
 	yum install -y libgnome					# this enables Dropbox to be installed
 	yum install -y timeshift
