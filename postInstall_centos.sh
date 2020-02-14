@@ -129,8 +129,16 @@ then
 	echo "active  -fstype=nfs  192.168.69.20:/volume1/Active" > /etc/auto.kabbalah
 	echo "archive  -fstype=nfs  192.168.69.20:/volume1/Archive" >> /etc/auto.kabbalah
 	echo "library  -fstype=nfs  192.168.69.20:/volume1/Library" >> /etc/auto.kabbalah
-	echo "media  -fstype=nfs  192.168.69.20:/volume1/Media" >> /etc/auto.kabbalah
 	echo "temp  -fstype=nfs  192.168.69.20:/volume1/Temp" >> /etc/auto.kabbalah
+	
+	mkdir /mnt/airbag
+	read -p 'Username: ' uservar
+	read -sp 'Password: ' passvar
+	echo "username=$uservar" > /etc/pwd_airbag.txt
+	echo "password=$passvar" >> /etc/pwd_airbag.txt
+	echo "/mnt/airbag /etc/auto.airbag --timeout=60" > /etc/auto.master
+	echo "LDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/LDRIVE" > /etc/auto.airbag
+	echo "SDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/SDRIVE" >> /etc/auto.airbag
 
 	systemctl enable autofs
 	systemctl restart autofs
