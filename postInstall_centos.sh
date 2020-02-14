@@ -136,6 +136,7 @@ then
 	read -sp 'Password: ' passvar
 	echo "username=$uservar" > /etc/pwd_airbag.txt
 	echo "password=$passvar" >> /etc/pwd_airbag.txt
+	unset uservar passvar
 	echo "/mnt/airbag /etc/auto.airbag --timeout=60" > /etc/auto.master
 	echo "LDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/LDRIVE" > /etc/auto.airbag
 	echo "SDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/SDRIVE" >> /etc/auto.airbag
