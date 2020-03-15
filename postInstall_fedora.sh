@@ -3,7 +3,7 @@
 echo -e "set-hostname: double-rabbi"
 hostnamectl set-hostname double-rabbi
 
-read -p "Setup yum? " -n 1 -r
+read -p "Install Basics? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
@@ -11,53 +11,40 @@ then
 	dnf install -y dnf-utils
 	dnf install -y deltarpm
 	dnf groupinstall -y "Development Tools"
-	dnf install -y kernel-devel
+	dnf install -y kernel-devel kernel-headers
 	dnf install -y dkms
-	dnf update
-fi
 
-read -p "Install Repos " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
+	dnf install -y fedora-workstation-repositories
+	dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+	dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+	dnf install -y timeshift
+	dnf install -y alacarte						# allow easy changing of app shortcuts
+	dnf install -y piper						# mouse configurator
+	dnf install -y handbrake-gui
+	dnf install -y libGLU						#needed for Nuke10
+	dnf install -y libusb       				#needed for PFTrack
+
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
 	dnf config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
+	dnf install -y turbovnc
 
 	rpm --import https://www.virtualgl.org/key/VGL-GPG-KEY
 	dnf config-manager --add-repo=https://virtualgl.org/pmwiki/uploads/Downloads/VirtualGL.repo
+	dnf install -y VirtualGL 
+
+	dnf install -y steam --enablerepo=rpmfusion-nonfree-steam
+	
+	dnf copr enable jdoss/wireguard
+	dnf install -y wireguard-dkms wireguard-tools
 
 	dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
+	dnf install -y VirtualBox-6.0.x86_64
 
-	dnf config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/fedora29/x86_64/cuda-fedora29.repo
+	dnf update
 
-	curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
+	#dnf install -y gcc make acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
 
-cat > /etc/yum.repos.d/epel-multimedia.repo << EOF
-[epel-multimedia]
-name=negativo17 - Multimedia
-baseurl=https://negativo17.org/repos/multimedia/epel-\$releasever/\$basearch/
-enabled=1
-skip_if_unavailable=1
-gpgkey=https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
-gpgcheck=1
-enabled_metadata=1
-metadata_expire=6h
-type=rpm-md
-repo_gpgcheck=0
-exclude=*cuda* *nvidia*
-
-[epel-multimedia-source]
-name=negativo17 - Multimedia - Source
-baseurl=https://negativo17.org/repos/multimedia/epel-\$releasever/SRPMS
-enabled=0
-skip_if_unavailable=1
-gpgkey=https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
-gpgcheck=1
-enabled_metadata=1
-metadata_expire=6h
-type=rpm-md
-repo_gpgcheck=0
-EOF
 fi
 
 read -p "Install Network? " -n 1 -r
@@ -76,37 +63,38 @@ then
 	# wireguard
 	echo "Adding IP Route for Wireguard"
 	echo "192.168.3.0/24 via 192.168.69.30 dev enp6s0" > /etc/sysconfig/network-scripts/route-enp6s0
+	echo "192.168.3.0/24 via 192.168.69.30 dev TheInternet" > /etc/sysconfig/network-scripts/route-TheInternet
+	echo "192.168.3.0/24 via 192.168.69.30 dev TheInternet_5GHz" > /etc/sysconfig/network-scripts/route-TheInternet_5GHz
 
 	# auto mount
 	mkdir /mnt/kabbalah
 	echo "/mnt/kabbalah /etc/auto.kabbalah --timeout=60" > /etc/auto.master
-
 	echo "active  -fstype=nfs  192.168.69.20:/volume1/Active" > /etc/auto.kabbalah
 	echo "library  -fstype=nfs  192.168.69.20:/volume1/Library" >> /etc/auto.kabbalah
 	echo "media  -fstype=nfs  192.168.69.20:/volume1/Media" >> /etc/auto.kabbalah
 	echo "temp  -fstype=nfs  192.168.69.20:/volume1/Temp" >> /etc/auto.kabbalah
 
+	mkdir /mnt/airbag
+	read -p 'Username: ' uservar
+	read -sp 'Password: ' passvar
+	echo "username=$uservar" > /etc/pwd_airbag.txt
+	echo "password=$passvar" >> /etc/pwd_airbag.txt
+	unset uservar passvar
+	echo "/mnt/airbag /etc/auto.airbag --timeout=60" >> /etc/auto.master
+	echo "LDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/LDRIVE" > /etc/auto.airbag
+	echo "SDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/SDRIVE" >> /etc/auto.airbag
+
+	mkdir /mnt/pixel
+	read -p 'Username: ' uservar
+	read -sp 'Password: ' passvar
+	echo "username=$uservar" > /etc/pwd_pixel.txt
+	echo "password=$passvar" >> /etc/pwd_pixel.txt
+	unset uservar passvar
+	echo "/mnt/pixel /etc/auto.pixel --timeout=60" >> /etc/auto.master
+	echo "MegaRAID  -fstype=cifs,rw,noperm,credentials=/etc/pwd_pixel.txt  ://MegaRAID/Active" > /etc/auto.pixel
+
 	systemctl enable autofs
 	systemctl restart autofs
-fi
-
-read -p "Install Others? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-	dnf install -y nano
-	dnf install -y gnome-system-monitor
-	dnf install -y eog						# eye of gnome image viewer
-	dnf install -y gnome-tweak-tool
-	dnf install -y libgnome					# this enables Dropbox to be installed
-	dnf install -y timeshift
-	dnf install -y alacarte					# allow easy changing of app shortcuts
-	dnf install -y piper					# mouse configurator
-	dnf install -y VirtualGL turbovnc
-	dnf install -y steam
-	dnf install -y wireguard-dkms wireguard-tools
-	# dnf install -y kmod-hfs kmod-hfsplus hfsplus-tools
-	dnf install -y VirtualBox-6.0.x86_64
 fi
 
 read -p "Install Licences? " -n 1 -r
@@ -124,25 +112,21 @@ read -p "Install Snaps? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	sudo yum -y install snapd
-	sudo ln -s /var/lib/snapd/snap /snap
+	dnf -y install snapd
+	ln -s /var/lib/snapd/snap /snap
 	systemctl enable snapd
 	systemctl start snapd
 	echo "pausing for 5 seconds while snapd starts"
 	sleep 5
-	sudo snap install snap-store
+	snap install snap-store
 	sudo snap install bitwarden
 	sudo snap install blender --classic
-	sudo snap install gimp
-	sudo snap install gitkraken
-	sudo snap install opera
 	sudo snap install slack --classic
-	sudo snap install spotify
 	sudo snap install sublime-text --classic
 	sudo snap install vlc
 fi
 
-read -p "Install VFX? " -n 1 -r
+read -p "Run Installers? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
@@ -153,25 +137,66 @@ then
 	/mnt/kabbalah/library/Software/Linux/Thinkbox/Deadline-*-linux-installers/DeadlineClient*.run --mode unattended --licensemode LicenseFree --connectiontype Remote --proxyrootdir 192.168.69.20:2847 --slavestartup true --launcherdaemon false
 	
 	echo "/mnt/kabbalah/library/Software/Linux/Blackmagic/DaVinci_Resolve_Studio_*.run -y" > /home/davidabbott/Desktop/INSTALL.txt
-	echo "sudo /mnt/kabbalah/library/Software/Linux/Foundry/Nuke/Nuke10.5v4-linux-x86-release-64-installer" >> /home/davidabbott/Desktop/INSTALL.txt
+
+
+
+# GitAhead
+cd /opt/
+/mnt/kabbalah/library/Software/Linux/GitAhead/GitAhead*.sh
+
+# NeatVideo
+/mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console
+
+# NUKE 10.5
+NUKESOURCE = /mnt/kabbalah/library/Software/Linux/Foundry/
+NUKEDESTIN = /opt/Nuke10.5v4
+
+mkdir $NUKEDESTIN
+cd $NUKEDESTIN
+unzip $NUKESOURCE/Nuke10.5v4-linux-x86-release-64-installer.run
+cp $NUKESOURCE/Nuke10.5/libidn.so.11 $NUKEDESTIN
+
+cat > /usr/share/applications/Nuke10.5v4 <<-EOF
+[Desktop Entry]
+Name=Nuke10.5v4
+Comment=
+Exec="/opt/Nuke10.5v4/Nuke10.5" -b  %f
+Terminal=false
+MimeType=application/x-nuke;
+Icon=/opt/Nuke10.5v4/plugins/icons/NukeApp48.png
+Type=Application
+Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
+EOF
+
+cat > /usr/share/applications/Nuke10.5v4 <<-EOF
+[Desktop Entry]
+Name=NukeX10.5v4
+Comment=
+Exec="/opt/Nuke10.5v4/Nuke10.5" -b --nukex %f
+Terminal=false
+MimeType=application/x-nuke;
+Icon=/opt/Nuke10.5v4/plugins/icons/NukeXApp48.png
+Type=Application
+Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
+EOF
+
 fi
 
 read -p "Install Nvidia? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	dnf clean all
-	dnf -y install cuda
-	systemctl isolate multi-user.target
-	bash /mnt/kabbalah/library/Software/Linux/Nvidia/NVIDIA-Linux-x86_64-*.run
+	sudo dnf install akmod-nvidia
+	sudo dnf install xorg-x11-drv-nvidia-cuda
 fi
 
-read -p "Add SSH Keys? " -n 1 -r
+read -p "Download Themes? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	mkdir /home/davidabbott/.ssh
-	echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKavYG91YOvgYPUOcNze9aK28+DPRnCvdqTXgrBc2kqS daves-macbook-pro" > /home/davidabbott/.ssh/authorized_keys
+	mkdir -p /github/ && cd $_
+	git clone https://github.com/vinceliuice/Tela-icon-theme.git
+	git clone https://github.com/linuxmint/cinnamon-spices-themes.git
 fi
 
 exit 0
