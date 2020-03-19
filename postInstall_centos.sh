@@ -187,26 +187,6 @@ then
 	echo "HOST 192.168.69.4 any 4101" > $RLM/ethernet.lic
 fi
 
-read -p "Set MIME Types? " -n 1 -r
-echo    # (optional) move to a new line
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-# nuke
-cat > /usr/share/mime/packages/project-nuke-script.xml << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-
-<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-  <mime-type type="application/x-nuke">
-    <comment>nuke script</comment>
-    <glob pattern="*.nk"/>
-  </mime-type>
-</mime-info>
-EOF
-
-# update MIME database
-update-mime-database /usr/share/mime
-fi
-
 read -p "Setup Theme? " -n 1 -r
 echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
@@ -303,8 +283,85 @@ then
 	
 	echo "Nuke and Resolve need to be installed from GUI. Check /scripts after reboot."
 	echo "/mnt/kabbalah/library/Software/Linux/Blackmagic/DaVinci_Resolve_Studio_*.run -y" > /scripts/install_Resolve.sh
-	echo "sudo /mnt/kabbalah/library/Software/Linux/Foundry/Nuke/Nuke10.5v4-linux-x86-release-64-installer" > /scripts/install_Nuke.sh
 	echo "sudo /mnt/kabbalah/library/Software/Linux/Redshift/redshift*.run" > /scripts/install_Redshift.sh
+
+# Nuke10.5
+	NUKE10="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-10.5*.run"
+	cp $NUKE10 /opt
+	chmod +x /opt/Nuke-10.5*.run
+	mkdir /opt/Nuke10.5v4 && cd $_
+	unzip /opt/Nuke10.5*.run
+
+# create menu icons
+cat > /usr/share/applications/Nuke10.5v4.desktop <<EOF
+[Desktop Entry]
+Name=Nuke10.5v4
+Comment=
+Exec="/opt/Nuke10.5v4/Nuke10.5" -b  %f
+Terminal=true
+MimeType=application/x-nuke;
+Icon=/opt/Nuke10.5v4/plugins/icons/NukeApp48.png
+Type=Application
+Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
+EOF
+
+cat > /usr/share/applications/NukeX10.5v4.desktop <<EOF
+[Desktop Entry]
+Name=NukeX10.5v4
+Comment=
+Exec="/opt/Nuke10.5v4/Nuke10.5" -b --nukex %f
+Terminal=true
+MimeType=application/x-nuke;
+Icon=/opt/Nuke10.5v4/plugins/icons/NukeXApp48.png
+Type=Application
+Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
+EOF
+
+# Nuke12.1
+	NUKE12="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-12*.run"
+	cp $NUKE12 /opt
+	cd /opt
+	chmod +x ./Nuke-12*.run
+	./Nuke-12*.run --accept-foundry-eula
+
+cat > /usr/share/applications/Nuke12.1v1.desktop <<EOF
+[Desktop Entry]
+Name=Nuke12.1v1
+Exec=/opt/Nuke12.1v1/Nuke12.1 
+Comment=
+Terminal=true
+MimeType=application/x-nuke;
+Icon=/opt/Nuke12.1v1/plugins/icons/NukeApp48.png
+Type=Application
+Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
+EOF
+
+cat > /usr/share/applications/NukeX12.1v1.desktop <<EOF
+[Desktop Entry]
+Name=NukeX12.1v1
+Exec=/opt/Nuke12.1v1/Nuke12.1 -b --nukex %f
+Comment=
+Terminal=true
+MimeType=application/x-nuke;
+Icon=/opt/Nuke12.1v1/plugins/icons/NukeXApp48.png
+Type=Application
+Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
+EOF
+
+# set Nuke mimetype
+cat > /usr/share/mime/packages/project-nuke-script.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-nuke">
+    <comment>nuke script</comment>
+    <glob pattern="*.nk"/>
+  </mime-type>
+</mime-info>
+EOF
+
+	update-mime-database /usr/share/mime
+
 fi
 
 read -p "Install Nvidia? " -n 1 -r

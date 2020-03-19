@@ -1,7 +1,23 @@
 #!/bin/sh
 
+#https://www.shellhacks.com/yes-no-bash-script-prompt-confirmation/
+
 echo -e "set-hostname: double-rabbi"
 hostnamectl set-hostname double-rabbi
+
+read -p "Remove Cruft? [y/N]" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	dnf remove -y exaile
+	dnf remove -y xawtv
+	dnf remove -y pidgin
+	dnf remove -y parole
+	dnf remove -y xfburn
+	dnf remove -y shotwell
+	dnf remove -y libreoffice*
+	dnf remove -y hexchat
+fi
 
 read -p "Install Basics? " -n 1 -r
 echo
@@ -14,6 +30,8 @@ then
 	dnf install -y kernel-devel kernel-headers
 	dnf install -y dkms
 
+	dnf update -y
+
 	dnf install -y fedora-workstation-repositories
 	dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
 	dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
@@ -24,6 +42,8 @@ then
 	dnf install -y handbrake-gui
 	dnf install -y libGLU						#needed for Nuke10
 	dnf install -y libusb       				#needed for PFTrack
+    dnf install -y blender
+    dnf install -y vlc
 
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
 	dnf config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
@@ -35,13 +55,15 @@ then
 
 	dnf install -y steam --enablerepo=rpmfusion-nonfree-steam
 	
-	dnf copr enable jdoss/wireguard
+    rpm --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
+    dnf config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
+    dnf install -y sublime-text
+
+	dnf copr enable jdoss/wireguard -y
 	dnf install -y wireguard-dkms wireguard-tools
 
 	dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
 	dnf install -y VirtualBox-6.0.x86_64
-
-	dnf update
 
 	#dnf install -y gcc make acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
 
@@ -91,7 +113,7 @@ then
 	echo "password=$passvar" >> /etc/pwd_pixel.txt
 	unset uservar passvar
 	echo "/mnt/pixel /etc/auto.pixel --timeout=60" >> /etc/auto.master
-	echo "MegaRAID  -fstype=cifs,rw,noperm,credentials=/etc/pwd_pixel.txt  ://MegaRAID/Active" > /etc/auto.pixel
+	echo "MegaRAID  -fstype=cifs,rw,noperm,credentials=/etc/pwd_pixel.txt  ://MegaRAID/MegaRAID" > /etc/auto.pixel
 
 	systemctl enable autofs
 	systemctl restart autofs
@@ -106,24 +128,6 @@ then
 	echo "HOST 192.168.69.2 any 4101" > $RLM/wifi.lic
 	echo "HOST 192.168.3.2 any 4101" > $RLM/wireguard.lic
 	echo "HOST 192.168.69.4 any 4101" > $RLM/ethernet.lic
-fi
-
-read -p "Install Snaps? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-	dnf -y install snapd
-	ln -s /var/lib/snapd/snap /snap
-	systemctl enable snapd
-	systemctl start snapd
-	echo "pausing for 5 seconds while snapd starts"
-	sleep 5
-	snap install snap-store
-	sudo snap install bitwarden
-	sudo snap install blender --classic
-	sudo snap install slack --classic
-	sudo snap install sublime-text --classic
-	sudo snap install vlc
 fi
 
 read -p "Run Installers? " -n 1 -r
@@ -142,52 +146,88 @@ then
 
 # GitAhead
 cd /opt/
-/mnt/kabbalah/library/Software/Linux/GitAhead/GitAhead*.sh
+/mnt/kabbalah/library/Software/Linux/GitAhead/GitAhead*.sh -y
 
 # NeatVideo
-/mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console
+/mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console -y
 
-# NUKE 10.5
-NUKESOURCE = /mnt/kabbalah/library/Software/Linux/Foundry/
-NUKEDESTIN = /opt/Nuke10.5v4
+# Nuke10.5
+	NUKE10="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-10.5*.run"
+	cp $NUKE10 /opt
+	chmod +x /opt/Nuke-10.5*.run
+	mkdir /opt/Nuke10.5v4 && cd $_
+	unzip /opt/Nuke10.5*.run
 
-mkdir $NUKEDESTIN
-cd $NUKEDESTIN
-unzip $NUKESOURCE/Nuke10.5v4-linux-x86-release-64-installer.run
-cp $NUKESOURCE/Nuke10.5/libidn.so.11 $NUKEDESTIN
-
-cat > /usr/share/applications/Nuke10.5v4 <<-EOF
+# create menu icons
+cat > /usr/share/applications/Nuke10.5v4.desktop <<EOF
 [Desktop Entry]
 Name=Nuke10.5v4
 Comment=
 Exec="/opt/Nuke10.5v4/Nuke10.5" -b  %f
-Terminal=false
+Terminal=true
 MimeType=application/x-nuke;
 Icon=/opt/Nuke10.5v4/plugins/icons/NukeApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
-cat > /usr/share/applications/Nuke10.5v4 <<-EOF
+cat > /usr/share/applications/NukeX10.5v4.desktop <<EOF
 [Desktop Entry]
 Name=NukeX10.5v4
 Comment=
 Exec="/opt/Nuke10.5v4/Nuke10.5" -b --nukex %f
-Terminal=false
+Terminal=true
 MimeType=application/x-nuke;
 Icon=/opt/Nuke10.5v4/plugins/icons/NukeXApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
-fi
+# Nuke12.1
+	NUKE12="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-12*.run"
+	cp $NUKE12 /opt
+	cd /opt
+	chmod +x ./Nuke-12*.run
+	./Nuke-12*.run --accept-foundry-eula
 
-read -p "Install Nvidia? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-	sudo dnf install akmod-nvidia
-	sudo dnf install xorg-x11-drv-nvidia-cuda
+cat > /usr/share/applications/Nuke12.1v1.desktop <<EOF
+[Desktop Entry]
+Name=Nuke12.1v1
+Exec=/opt/Nuke12.1v1/Nuke12.1 
+Comment=
+Terminal=true
+MimeType=application/x-nuke;
+Icon=/opt/Nuke12.1v1/plugins/icons/NukeApp48.png
+Type=Application
+Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
+EOF
+
+cat > /usr/share/applications/NukeX12.1v1.desktop <<EOF
+[Desktop Entry]
+Name=NukeX12.1v1
+Exec=/opt/Nuke12.1v1/Nuke12.1 -b --nukex %f
+Comment=
+Terminal=true
+MimeType=application/x-nuke;
+Icon=/opt/Nuke12.1v1/plugins/icons/NukeXApp48.png
+Type=Application
+Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
+EOF
+
+# set mimetype
+cat > /usr/share/mime/packages/project-nuke-script.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-nuke">
+    <comment>nuke script</comment>
+    <glob pattern="*.nk"/>
+  </mime-type>
+</mime-info>
+EOF
+
+	update-mime-database /usr/share/mime
+
 fi
 
 read -p "Download Themes? " -n 1 -r
@@ -197,6 +237,14 @@ then
 	mkdir -p /github/ && cd $_
 	git clone https://github.com/vinceliuice/Tela-icon-theme.git
 	git clone https://github.com/linuxmint/cinnamon-spices-themes.git
+fi
+
+read -p "Install Nvidia? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	sudo dnf install -y akmod-nvidia
+	sudo dnf install -y xorg-x11-drv-nvidia-cuda
 fi
 
 exit 0
