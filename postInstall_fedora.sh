@@ -199,12 +199,17 @@ Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
-# Nuke12.1
-	NUKE12="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-12*.run"
-	cp $NUKE12 /opt
+# Nuke12.0
+	NUKE12="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-12.0*.run"
+	chmod +x $NUKE12
 	cd /opt
-	chmod +x ./Nuke-12*.run
-	./Nuke-12*.run --accept-foundry-eula
+	$NUKE12 --accept-foundry-eula
+
+# Nuke12.1
+	NUKE12="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-12.1*.run"
+	chmod +x $NUKE12
+	cd /opt
+	$NUKE12 --accept-foundry-eula
 
 cat > /usr/share/applications/Nuke12.1v1.desktop <<EOF
 [Desktop Entry]
