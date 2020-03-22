@@ -40,10 +40,13 @@ then
 	dnf install -y alacarte						# allow easy changing of app shortcuts
 	dnf install -y piper						# mouse configurator
 	dnf install -y handbrake-gui
-	dnf install -y libGLU						#needed for Nuke10
-	dnf install -y libusb       				#needed for PFTrack
     dnf install -y blender
     dnf install -y vlc
+    dnf install -y ffmpeg
+    dnf install -y vulkan*						# used by some games
+
+	dnf install -y libGLU						# needed for Nuke10.5
+	dnf install -y libusb       				# needed for PFTrack
 
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
 	dnf config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
@@ -65,7 +68,7 @@ then
 	dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
 	dnf install -y VirtualBox-6.0.x86_64
 
-	#dnf install -y gcc make acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
+	#dnf install -y acpid pkgconfig
 
 fi
 
@@ -138,7 +141,7 @@ then
 	rpm -i '/mnt/kabbalah/library/Software/Linux/PixelFarm/pfmanager-2018.13.28-1.x86_64.rpm'
 	rpm -i '/mnt/kabbalah/library/Software/Linux/DJV/DJV*.rpm'
 
-	/mnt/kabbalah/library/Software/Linux/Thinkbox/Deadline-*-linux-installers/DeadlineClient*.run --mode unattended --licensemode LicenseFree --connectiontype Remote --proxyrootdir 192.168.69.20:2847 --slavestartup true --launcherdaemon false
+	/mnt/kabbalah/library/Software/Linux/Thinkbox/DeadlineClient*.run --mode unattended --licensemode LicenseFree --connectiontype Remote --proxyrootdir 192.168.69.20:2847 --slavestartup true --launcherdaemon false
 	
 	echo "/mnt/kabbalah/library/Software/Linux/Blackmagic/DaVinci_Resolve_Studio_*.run -y" > /home/davidabbott/Desktop/INSTALL.txt
 
@@ -147,6 +150,17 @@ then
 # GitAhead
 cd /opt/
 /mnt/kabbalah/library/Software/Linux/GitAhead/GitAhead*.sh -y
+
+cat > /usr/share/applications/GitAhead.desktop <<EOF
+[Desktop Entry]
+Name=GitAhead
+Comment=
+Exec="/opt/GitAhead/GitAhead"
+Terminal=false
+Icon=/opt/GitAhead/Resources/GitAhead.iconset/icon_64x64@2x.png
+Type=Application
+Categories=Development;
+EOF
 
 # NeatVideo
 /mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console -y
@@ -157,13 +171,15 @@ cd /opt/
 	chmod +x /opt/Nuke-10.5*.run
 	mkdir /opt/Nuke10.5v4 && cd $_
 	unzip /opt/Nuke10.5*.run
+	cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libidn.so.11 /opt/Nuke10.5v4
+	cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libGLU.so.1.3.1 /lib64
 
 # create menu icons
 cat > /usr/share/applications/Nuke10.5v4.desktop <<EOF
 [Desktop Entry]
 Name=Nuke10.5v4
 Comment=
-Exec="/opt/Nuke10.5v4/Nuke10.5" -b  %f
+Exec="/opt/Nuke10.5v4/Nuke10.5" %f
 Terminal=true
 MimeType=application/x-nuke;
 Icon=/opt/Nuke10.5v4/plugins/icons/NukeApp48.png
@@ -193,7 +209,7 @@ EOF
 cat > /usr/share/applications/Nuke12.1v1.desktop <<EOF
 [Desktop Entry]
 Name=Nuke12.1v1
-Exec=/opt/Nuke12.1v1/Nuke12.1 
+Exec=env QT_SCALE_FACTOR=1.5 /opt/Nuke12.1v1/Nuke12.1
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
@@ -205,7 +221,7 @@ EOF
 cat > /usr/share/applications/NukeX12.1v1.desktop <<EOF
 [Desktop Entry]
 Name=NukeX12.1v1
-Exec=/opt/Nuke12.1v1/Nuke12.1 -b --nukex %f
+Exec=env QT_SCALE_FACTOR=1.5 /opt/Nuke12.1v1/Nuke12.1 -b --nukex %f
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
