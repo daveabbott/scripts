@@ -135,6 +135,7 @@ then
 	mkdir /mnt/airbag
 	read -p 'Username: ' uservar
 	read -sp 'Password: ' passvar
+	echo airbag credential are the same as macbook credentials
 	echo "username=$uservar" > /etc/pwd_airbag.txt
 	echo "password=$passvar" >> /etc/pwd_airbag.txt
 	unset uservar passvar
@@ -297,7 +298,7 @@ cat > /usr/share/applications/Nuke10.5v4.desktop <<EOF
 [Desktop Entry]
 Name=Nuke10.5v4
 Comment=
-Exec="/opt/Nuke10.5v4/Nuke10.5" -b  %f
+Exec="/opt/Nuke10.5v4/Nuke10.5" %f
 Terminal=true
 MimeType=application/x-nuke;
 Icon=/opt/Nuke10.5v4/plugins/icons/NukeApp48.png
@@ -317,17 +318,22 @@ Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
-# Nuke12.1
-	NUKE12="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-12*.run"
-	cp $NUKE12 /opt
+# Nuke12.0
+	NUKE12="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-12.0*.run"
+	chmod +x $NUKE12
 	cd /opt
-	chmod +x ./Nuke-12*.run
-	./Nuke-12*.run --accept-foundry-eula
+	$NUKE12 --accept-foundry-eula
+
+# Nuke12.1
+	NUKE12="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-12.1*.run"
+	chmod +x $NUKE12
+	cd /opt
+	$NUKE12 --accept-foundry-eula
 
 cat > /usr/share/applications/Nuke12.1v1.desktop <<EOF
 [Desktop Entry]
 Name=Nuke12.1v1
-Exec=/opt/Nuke12.1v1/Nuke12.1 
+Exec=env QT_SCALE_FACTOR=1.5 /opt/Nuke12.1v1/Nuke12.1
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
@@ -339,7 +345,7 @@ EOF
 cat > /usr/share/applications/NukeX12.1v1.desktop <<EOF
 [Desktop Entry]
 Name=NukeX12.1v1
-Exec=/opt/Nuke12.1v1/Nuke12.1 -b --nukex %f
+Exec=env QT_SCALE_FACTOR=1.5 /opt/Nuke12.1v1/Nuke12.1 -b --nukex %f
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
@@ -348,7 +354,7 @@ Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
-# set Nuke mimetype
+# set mimetype
 cat > /usr/share/mime/packages/project-nuke-script.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 
