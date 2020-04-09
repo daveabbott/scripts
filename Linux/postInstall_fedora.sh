@@ -148,6 +148,32 @@ Type=Application
 Categories=Development;
 EOF
 
+# Mocha
+	dnf install -y '/mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020*.rpm'
+
+cat > /usr/share/applications/mochapro2020.desktop << EOF
+[Desktop Entry]
+Name=Mocha Pro 2020
+Comment=
+Exec=/usr/bin/mochapro2020
+Terminal=true
+MimeType=application/mochapro;
+Icon=/opt/isl/MochaPro2020/resources/mochaproIcon.ico
+Type=Application
+Categories=Graphics;
+EOF
+
+cat > /usr/share/mime/packages/project-mocha-script.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/mochapro">
+    <comment>nuke script</comment>
+    <glob pattern="*.mocha"/>
+  </mime-type>
+</mime-info>
+EOF
+
 # NeatVideo
 	/mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console -y
 

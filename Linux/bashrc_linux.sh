@@ -36,3 +36,11 @@ alias wg-edit="sudo nano /etc/wireguard/wg0.conf"
 # turbovnc
 alias turbo="/opt/TurboVNC/bin/vncserver"
 alias turbok="/opt/TurboVNC/bin/vncserver -kill :1"
+
+#########################################################
+
+# ocio
+export OCIO="/opt/Nuke12.1v1/plugins/OCIOConfigs/configs/aces_1.1/config.ocio"
+
+# redshift
+# export REDSHIFT_PATHOVERRIDE_FILE=/mnt/SSD_1TB/GitHub/scripts/redshift/redshift_pathmapping.txt
