@@ -69,6 +69,11 @@ then
 # virtualbox
 	dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
 	dnf install -y VirtualBox-6.0.x86_64
+# makemkv
+	dnf config-manager --add-repo=https://negativo17.org/repos/fedora-multimedia.repo
+	sed -i '/repo_gpgcheck=0/a exclude=*nvidia* *HandBrake* *ffmpeg* live555 x264-libs x265-libs *gstreamer*' /etc/yum.repos.d/fedora-multimedia.repo # th
+	dnf install -y makemkv libdvdcss
+	echo "T-UWwbYn781f1gjZcH5NOsJkGgWHnUkQsr2IduoSJ8sssNXOqclsWhowNWTclkBjHIMH" > /makemkv-betakey.txt
 fi
 
 read -p "Install Network? " -n 1 -r
