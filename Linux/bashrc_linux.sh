@@ -18,8 +18,6 @@ alias shutdown='sudo /sbin/shutdown'
 
 # applications
 alias houdini="/opt/hfs17.5/bin/happrentice"
-alias nuke10="/opt/Nuke10.5v4/Nuke10.5 --nukex"
-alias nuke12="/opt/Nuke12.1v1/Nuke12.1 --nukex"
 alias resolve="/opt/resolve/bin/resolve"
 
 # virtualgl
@@ -44,3 +42,7 @@ export OCIO="/opt/Nuke12.1v1/plugins/OCIOConfigs/configs/aces_1.1/config.ocio"
 
 # redshift
 # export REDSHIFT_PATHOVERRIDE_FILE=/mnt/SSD_1TB/GitHub/scripts/redshift/redshift_pathmapping.txt
+
+# makemkv and vlc
+export LIBBDPLUS_PATH=/usr/lib64/libmmbd.so.0
+export LIBAACS_PATH=/usr/lib64/libmmbd.so.0
