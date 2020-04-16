@@ -154,7 +154,7 @@ Categories=Development;
 EOF
 
 # Mocha
-	dnf install -y '/mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020*.rpm'
+	dnf install '/mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020-7.0.4-9.g7a500571e508.x86_64.rpm'
 
 cat > /usr/share/applications/mochapro2020.desktop << EOF
 [Desktop Entry]
@@ -289,7 +289,7 @@ EOF
 # Redshift
 	sudo /mnt/kabbalah/library/Software/Linux/Redshift/redshift_v2.6.5*.run --quiet
 # Slack
-	dnf install -y '/mnt/kabbalah/library/Software/Linux/Slack/slack*.rpm'
+	dnf install -y '/mnt/kabbalah/library/Software/Linux/Slack/slack-4.4.0-0.1.fc21.x86_64.rpm'
 # Zoom
 	RPM_ZOOM="/mnt/kabbalah/library/Software/Linux/Zoom/zoom_x86_64.rpm"
 	wget -q https://zoom.us/client/latest/zoom_x86_64.rpm -O $RPM_ZOOM
