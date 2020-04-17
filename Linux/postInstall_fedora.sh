@@ -35,6 +35,10 @@ then
 	dnf install -y fedora-workstation-repositories
 	dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
 	dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+	sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree.repo
+	sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree-nvidia-driver.repo
+	sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree-updates.repo
+
 
 	dnf install -y timeshift
 	dnf install -y alacarte						# allow easy changing of app shortcuts
@@ -58,7 +62,7 @@ then
 	dnf config-manager --add-repo=https://negativo17.org/repos/fedora-spotify.repo
 	dnf install -y spotify-client
 # steam
-	dnf install -y steam --enablerepo=rpmfusion-nonfree-steam
+	dnf install -y steam
 # sublime
     rpm --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
     dnf config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
@@ -71,9 +75,16 @@ then
 	dnf install -y VirtualBox-6.0.x86_64
 # makemkv
 	dnf config-manager --add-repo=https://negativo17.org/repos/fedora-multimedia.repo
-	sed -i '/repo_gpgcheck=0/a exclude=*nvidia* *ffmpeg* *gstreamer* *HandBrake* *live555* x264-libs x265-libs *vlc*' /etc/yum.repos.d/fedora-multimedia.repo # this prevents clashes with RPMFusion
+	sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia* *ffmpeg* *gstreamer* *HandBrake* *live555* x264-libs x265-libs *vlc*' /etc/yum.repos.d/fedora-multimedia.repo # this prevents clashes with RPMFusion
 	dnf install -y makemkv libdvdcss
 	echo "T-UWwbYn781f1gjZcH5NOsJkGgWHnUkQsr2IduoSJ8sssNXOqclsWhowNWTclkBjHIMH" > /makemkv-betakey.txt
+# cuda
+	dnf config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/fedora29/x86_64/cuda-fedora29.repo
+	dnf --disablerepo="rpmfusion-nonfree*" install cuda
+	echo "blacklist nouveau" > /usr/lib/modprobe.d/blacklist-nouveau.conf
+	echo "options nouveau modeset=0" >> /usr/lib/modprobe.d/blacklist-nouveau.conf
+	sudo dracut --force
+	grub2-mkconfig -o /boot/grub2/grub.cfg
 fi
 
 read -p "Install Network? " -n 1 -r
@@ -154,7 +165,8 @@ Categories=Development;
 EOF
 
 # Mocha
-	dnf install '/mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020-7.0.4-9.g7a500571e508.x86_64.rpm'
+	MOCHA2020="/mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020*.rpm"
+	dnf install $MOCHA2020
 
 cat > /usr/share/applications/mochapro2020.desktop << EOF
 [Desktop Entry]
@@ -180,7 +192,7 @@ cat > /usr/share/mime/packages/project-mocha-script.xml << EOF
 EOF
 
 # NeatVideo
-	/mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console -y
+	/mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console
 
 # Nuke10.5
 	NUKE10="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-10.5*.run"
@@ -289,7 +301,7 @@ EOF
 # Redshift
 	sudo /mnt/kabbalah/library/Software/Linux/Redshift/redshift_v2.6.5*.run --quiet
 # Slack
-	dnf install -y '/mnt/kabbalah/library/Software/Linux/Slack/slack-4.4.0-0.1.fc21.x86_64.rpm'
+	dnf install -y /mnt/kabbalah/library/Software/Linux/Slack/slack*.rpm
 # Zoom
 	RPM_ZOOM="/mnt/kabbalah/library/Software/Linux/Zoom/zoom_x86_64.rpm"
 	wget -q https://zoom.us/client/latest/zoom_x86_64.rpm -O $RPM_ZOOM
@@ -297,7 +309,6 @@ EOF
 
 # update mime
 	update-mime-database /usr/share/mime
-
 fi
 
 read -p "Install Licences? " -n 1 -r
@@ -320,14 +331,6 @@ then
 	mkdir -p /github/ && cd $_
 	git clone https://github.com/vinceliuice/Tela-icon-theme.git
 	git clone https://github.com/linuxmint/cinnamon-spices-themes.git
-fi
-
-read -p "Install Nvidia? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-	sudo dnf install -y akmod-nvidia
-	sudo dnf install -y xorg-x11-drv-nvidia-cuda
 fi
 
 exit 0
