@@ -39,7 +39,6 @@ then
 	sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree-nvidia-driver.repo
 	sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree-updates.repo
 
-
 	dnf install -y timeshift
 	dnf install -y alacarte						# allow easy changing of app shortcuts
 	dnf install -y piper						# mouse configurator
@@ -148,6 +147,7 @@ then
 	/mnt/kabbalah/library/Software/Linux/Thinkbox/DeadlineClient*.run --mode unattended --licensemode LicenseFree --connectiontype Remote --proxyrootdir 192.168.69.20:2847 --slavestartup true --launcherdaemon false
 #DaVinci Resolve
 	# this needs to be installed as a user and not as root.
+	# deleting all but the nvidia .icd files may help this run
 	echo "/mnt/kabbalah/library/Software/Linux/Blackmagic/DaVinci_Resolve_Studio_*.run -iy" > /install_Resolve.sh
 # GitAhead
 	cd /opt/
@@ -199,7 +199,7 @@ EOF
 	cp $NUKE10 /opt
 	chmod +x /opt/Nuke-10.5*.run
 	mkdir /opt/Nuke10.5v4 && cd $_
-	unzip /opt/Nuke10.5*.run
+	unzip /opt/Nuke-10.5*.run
 	cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libidn.so.11 /opt/Nuke10.5v4
 	cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libGLU.so.1.3.1 /lib64
 
@@ -248,7 +248,7 @@ EOF
 cat > /usr/share/applications/NukeX12.0v5.desktop <<EOF
 [Desktop Entry]
 Name=NukeX12.0v5
-Exec=/opt/Nuke12.0v5/Nuke12.0 --nukex -q
+Exec=/opt/Nuke12.0v5/Nuke12.0 -q--nukex
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
