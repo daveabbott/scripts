@@ -165,8 +165,7 @@ Categories=Development;
 EOF
 
 # Mocha
-	MOCHA2020="/mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020*.rpm"
-	dnf install $MOCHA2020
+	dnf install -y /mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020*.rpm
 
 cat > /usr/share/applications/mochapro2020.desktop << EOF
 [Desktop Entry]

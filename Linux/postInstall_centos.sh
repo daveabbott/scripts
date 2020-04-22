@@ -154,59 +154,6 @@ then
 	systemctl restart autofs
 fi
 
-read -p "Setup Theme? " -n 1 -r
-echo    # (optional) move to a new line
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-	mkdir -p /usr/share/themes/ && cd $_
-	git clone https://github.com/EliverLara/Nordic.git
-
-	mkdir -p /github/ && cd $_
-	git clone https://github.com/vinceliuice/Tela-icon-theme.git
-
-# shrink ridiculouly oversized title bar in gnome
-cat > ~/.config/gtk-3.0/gtk.css << EOF
-headerbar {
-    min-height: 0px;
-    padding-left: 2px;
-    padding-right: 2px;
-}
-
-headerbar entry,
-headerbar spinbutton,
-headerbar button,
-headerbar separator {
-    margin-top: 0px;
-    margin-bottom: 0px;
-}
-
-/* shrink ssd titlebars */
-.default-decoration {
-    min-height: 0;
-    padding: 3px;
-}
-
-.default-decoration .titlebutton {
-    min-height: 0px;
-    min-width: 0px;
-}
-
-window.ssd headerbar.titlebar {
-    padding-left: 6px;
-    padding-right: 6px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    min-height: 0;
-}
-
-window.ssd headerbar.titlebar button.titlebutton {
-    padding-top: 3px;
-    padding-bottom:3px;
-    min-height: 0;
-}
-EOF
-fi
-
 read -p "Run Installers? " -n 1 -r
 echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
@@ -225,7 +172,7 @@ then
 	cd /opt/
 	/mnt/kabbalah/library/Software/Linux/GitAhead/GitAhead*.sh -y
 
-cat > /usr/share/applications/GitAhead.desktop <<EOF
+cat > /home/davidabbott/.local/share/applications/GitAhead.desktop <<EOF
 [Desktop Entry]
 Name=GitAhead
 Comment=
@@ -237,7 +184,7 @@ Categories=Development;
 EOF
 
 # Mocha
-	dnf install -y '/mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020*.rpm'
+	dnf install -y /mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020*.rpm
 
 cat > /home/davidabbott/.local/share/applications/mochapro2020.desktop << EOF
 [Desktop Entry]
@@ -270,7 +217,7 @@ EOF
 	cp $NUKE10 /opt
 	chmod +x /opt/Nuke-10.5*.run
 	mkdir /opt/Nuke10.5v4 && cd $_
-	unzip /opt/Nuke10.5*.run
+	unzip /opt/Nuke-10.5*.run
 	cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libidn.so.11 /opt/Nuke10.5v4
 	cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libGLU.so.1.3.1 /lib64
 
@@ -347,7 +294,7 @@ EOF
 # Redshift
 	sudo /mnt/kabbalah/library/Software/Linux/Redshift/redshift_v2.6.5*.run --quiet
 # Slack
-	dnf install -y '/mnt/kabbalah/library/Software/Linux/Slack/slack*.rpm'
+	dnf install -y /mnt/kabbalah/library/Software/Linux/Slack/slack*.rpm
 # Zoom
 	RPM_ZOOM="/mnt/kabbalah/library/Software/Linux/Zoom/zoom_x86_64.rpm"
 	wget -q https://zoom.us/client/latest/zoom_x86_64.rpm -O $RPM_ZOOM
