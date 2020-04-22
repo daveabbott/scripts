@@ -82,7 +82,7 @@ then
 	dnf --disablerepo="rpmfusion-nonfree*" install cuda
 	echo "blacklist nouveau" > /usr/lib/modprobe.d/blacklist-nouveau.conf
 	echo "options nouveau modeset=0" >> /usr/lib/modprobe.d/blacklist-nouveau.conf
-	sudo dracut --force
+	dracut --force
 	grub2-mkconfig -o /boot/grub2/grub.cfg
 fi
 

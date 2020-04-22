@@ -25,67 +25,71 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	yum makecache
 	yum install -y epel-release yum-utils
-	yum install -y deltarpm
+	#yum install -y deltarpm
 	yum groupinstall -y "Development Tools"
-	yum groupinstall -y "Fonts"
+	#yum groupinstall -y "Fonts"
 	yum install -y kernel-devel
+	yum install -y kernel-headers
 	yum install -y dkms
+
+	yum-config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo
+	yum -y install nvidia-driver-latest-dkms nvidia settings cuda
+	export PATH=/usr/local/cuda-10.2/bin:/usr/local/cuda-10.2/NsightCompute-2019.1${PATH:+:${PATH}}
+	echo "blacklist nouveau" > /etc/modprobe.d/blacklist.conf
+	dracut --force
+	grub2-mkconfig -o /boot/grub2/grub.cfg
 
 	yum update -y
 
-	yum localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
-	yum localinstall --nogpgcheck https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
-	
+	yum localinstall -y --nogpgcheck https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
+	sed -i '/gpgcheck=1/a exclude=*nvidia* *cuda*' /etc/yum.repos.d/rpmfusion-nonfree*.repo
+	yum localinstall -y --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
+	sed -i '/gpgcheck=1/a exclude=*nvidia* *cuda* *vlc* x264-libs x265-libs' /etc/yum.repos.d/rpmfusion-free*.repo
+
 	yum-config-manager --add-repo=https://negativo17.org/repos/epel-multimedia.repo
-	sed -i '/repo_gpgcheck=0/a exclude=*nvidia* *ffmpeg* *gstreamer* *HandBrake* *live555* x264-libs x265-libs *vlc*' /etc/yum.repos.d/epel-multimedia.repo # this prevents clashes with RPMFusion
+	sed -i '/repo_gpgcheck=0/a exclude=*nvidia* *cuda*' /etc/yum.repos.d/epel-multimedia.repo
 
-	yum install https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+	yum install -y https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
 
-	yum-config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo
-
-    yum install -y vlc
-    yum install -y ffmpeg
-
-    yum install -y file-roller
-	yum install -y wget
+	yum install -y vlc
+	#yum install -y file-roller
+	#yum install -y wget
 	yum install -y ffmpeg
 	yum install -y handbrake-gui
-	yum install -y nano
-	yum install -y gnome-system-monitor
-	yum install -y eog							# eye of gnome image viewer
-	yum install -y gnome-tweak-tool
+	#yum install -y nano
+	#yum install -y gnome-system-monitor
+	#yum install -y eog
+	#yum install -y gnome-tweak-tool
 	yum install -y timeshift
-	yum install -y alacarte						# allow easy changing of app shortcuts
-	yum install -y piper						# mouse configurator
-	yum install -y wireguard-dkms wireguard-tools
-	yum install -y kmod-hfs kmod-hfsplus hfsplus-tools
+	yum install -y piper								# mouse configurator
+	yum install -y kmod-hfs kmod-hfsplus hfsplus-tools	# allows reading of mac drives
 
-	yum install -y qt-x11.x86_64 				# required for Redshift Licencing Tool
-	yum install -y libpng12 					# required for Redshift Licencing Tool
-	yum install -y redhat-lsb-core 				# required for Redshift
-	yum install -y qt5-qtbase-devel				# required for Mocha and VLC
+	yum install -y qt-x11.x86_64						# required for Redshift Licencing Tool
+	yum install -y libpng12								# required for Redshift Licencing Tool
+	yum install -y redhat-lsb-core						# required for Redshift
+	yum install -y qt5-qtbase-devel						# required for Mocha and VLC
 
 # turbovnc
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
-	yum config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
+	yum-config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
 	yum install -y turbovnc
 # virtualgl
 	rpm --import https://www.virtualgl.org/key/VGL-GPG-KEY
-	yum config-manager --add-repo=https://virtualgl.org/pmwiki/uploads/Downloads/VirtualGL.repo
-	yum install -y VirtualGL 
+	yum-config-manager --add-repo=https://virtualgl.org/pmwiki/uploads/Downloads/VirtualGL.repo
+	yum install -y VirtualGL
 # spotify
-	yum config-manager --add-repo=https://negativo17.org/repos/fedora-spotify.repo
+	yum-config-manager --add-repo=https://negativo17.org/repos/fedora-spotify.repo
 	yum install -y spotify-client
 # steam
 	rpm --import https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
 	yum-config-manager --add-repo=https://negativo17.org/repos/epel-steam.repo
 # sublime
-    rpm --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
-    yum config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
-    yum install -y sublime-text
+	rpm --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
+	yum-config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
+	yum install -y sublime-text
 # wireguard
-	yum copr enable jdoss/wireguard -y
-	yum install -y wireguard-dkms wireguard-tools
+	yum install -y yum-plugin-elrepo
+	yum install -y kmod-wireguard wireguard-tools
 # virtualbox
 	yum-config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo
 	yum install -y VirtualBox-6.0.x86_64
@@ -94,24 +98,12 @@ then
 	echo "T-UWwbYn781f1gjZcH5NOsJkGgWHnUkQsr2IduoSJ8sssNXOqclsWhowNWTclkBjHIMH" > /makemkv-betakey.txt
 fi
 
-read -p "Install GUI? " -n 1 -r
-echo    # (optional) move to a new line
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-	yum groupinstall -y "X Window System"
-	yum install -y gnome-classic-session gnome-terminal gnome-tweak-tool gnome-disk-utility nautilus-open-terminal control-center
-	systemctl disable gdm
-	unlink /etc/systemd/system/default.target
-	ln -sf /lib/systemd/system/graphical.target /etc/systemd/system/default.target
-	systemctl enable gdm
-fi
-
 read -p "Install Network? " -n 1 -r
 echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	yum install -y firewalld firewall-config
-	yum install -y samba-client samba-common cifs-utils autofs nfs-utils
+	#yum install -y firewalld firewall-config
+	#yum install -y samba-client samba-common cifs-utils autofs nfs-utils
 # firewall settings
 	firewall-cmd --zone=public --permanent --add-port=5900/tcp
 	firewall-cmd --zone=public --permanent --add-service=vnc-server
@@ -159,10 +151,10 @@ echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 # PFtrack
-	dnf install -y '/mnt/kabbalah/library/Software/Linux/PixelFarm/pftrack-2016.24.29-1.x86_64.rpm'
-	dnf install -y '/mnt/kabbalah/library/Software/Linux/PixelFarm/pfmanager-2018.13.28-1.x86_64.rpm'
+	yum install -y /mnt/kabbalah/library/Software/Linux/PixelFarm/pftrack-2016*.rpm
+	yum install -y /mnt/kabbalah/library/Software/Linux/PixelFarm/pfmanager-2018*.rpm
 # DJV
-	dnf install -y '/mnt/kabbalah/library/Software/Linux/DJV/DJV*.rpm'
+	yum install -y /mnt/kabbalah/library/Software/Linux/DJV/DJV*.rpm
 # Deadline
 	/mnt/kabbalah/library/Software/Linux/Thinkbox/DeadlineClient*.run --mode unattended --licensemode LicenseFree --connectiontype Remote --proxyrootdir 192.168.69.20:2847 --slavestartup true --launcherdaemon false
 #DaVinci Resolve
@@ -184,7 +176,7 @@ Categories=Development;
 EOF
 
 # Mocha
-	dnf install -y /mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020*.rpm
+	yum install -y /mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020*.rpm
 
 cat > /home/davidabbott/.local/share/applications/mochapro2020.desktop << EOF
 [Desktop Entry]
@@ -210,16 +202,15 @@ cat > /usr/share/mime/packages/project-mocha-script.xml << EOF
 EOF
 
 # NeatVideo
-	/mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console -y
+	/mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console
 
 # Nuke10.5
 	NUKE10="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-10.5*.run"
-	cp $NUKE10 /opt
-	chmod +x /opt/Nuke-10.5*.run
+	chmod +x $NUKE10
 	mkdir /opt/Nuke10.5v4 && cd $_
-	unzip /opt/Nuke-10.5*.run
-	cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libidn.so.11 /opt/Nuke10.5v4
-	cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libGLU.so.1.3.1 /lib64
+	unzip $NUKE10
+	#cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libidn.so.11 /opt/Nuke10.5v4
+	#cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libGLU.so.1.3.1 /lib64
 
 cat > /home/davidabbott/.local/share/applications/Nuke10.5v4.desktop <<EOF
 [Desktop Entry]
@@ -292,13 +283,13 @@ cat > /usr/share/mime/packages/project-nuke-script.xml << EOF
 </mime-info>
 EOF
 # Redshift
-	sudo /mnt/kabbalah/library/Software/Linux/Redshift/redshift_v2.6.5*.run --quiet
+	/mnt/kabbalah/library/Software/Linux/Redshift/redshift_v2.6.5*.run --quiet
 # Slack
-	dnf install -y /mnt/kabbalah/library/Software/Linux/Slack/slack*.rpm
+	yum install -y /mnt/kabbalah/library/Software/Linux/Slack/slack*.rpm
 # Zoom
 	RPM_ZOOM="/mnt/kabbalah/library/Software/Linux/Zoom/zoom_x86_64.rpm"
 	wget -q https://zoom.us/client/latest/zoom_x86_64.rpm -O $RPM_ZOOM
-	dnf install -y $RPM_ZOOM
+	yum install -y $RPM_ZOOM
 
 # update mime
 	update-mime-database /usr/share/mime
@@ -313,13 +304,6 @@ then
 	echo "HOST 192.168.69.2 any 4101" > $RLM/wifi.lic
 	echo "HOST 192.168.3.2 any 4101" > $RLM/wireguard.lic
 	echo "HOST 192.168.69.4 any 4101" > $RLM/ethernet.lic
-fi
-
-read -p "Install Nvidia? " -n 1 -r
-echo    # (optional) move to a new line
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-	sudo yum -y install nvidia-driver-latest-dkms cuda
 fi
 
 exit 0
