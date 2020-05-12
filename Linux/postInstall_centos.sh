@@ -48,7 +48,7 @@ then
 	yum install -y https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
 
 	yum install -y vlc
-	yum install -y ffmpeg
+	yum install -y ffmpeg compat-ffmpeg28				# compat allows firefox to play mp4
 	yum install -y handbrake-gui
 	yum install -y timeshift
 	yum install -y kmod-hfs kmod-hfsplus hfsplus-tools	# allows reading of mac drives. slow to install.
@@ -57,6 +57,7 @@ then
 	yum install -y redhat-lsb-core						# required for Redshift
 	yum install -y qt5-qtbase-devel						# required for Mocha and VLC
 	yum install -y gstreamer1-libav						# required for VLC
+	yum install -y nodejs								# required for Sublime CSS/HTML tidying
 # turbovnc
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
 	yum-config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
@@ -66,7 +67,7 @@ then
 	yum-config-manager --add-repo=https://virtualgl.org/pmwiki/uploads/Downloads/VirtualGL.repo
 	yum install -y VirtualGL
 # spotify
-	yum-config-manager --add-repo=https://negativo17.org/repos/fedora-spotify.repo
+	yum-config-manager --add-repo=https://negativo17.org/repos/epel-spotify.repo
 	yum install -y spotify-client
 # steam
 	rpm --import https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
@@ -150,7 +151,19 @@ then
 	/mnt/kabbalah/library/Software/Linux/Thinkbox/DeadlineClient*.run --mode unattended --licensemode LicenseFree --connectiontype Remote --proxyrootdir 192.168.69.20:2847 --slavestartup true --launcherdaemon false
 # DaVinci Resolve
 	# this needs to be installed as a user and not as root. Run the script this creates at /.
-	echo "/mnt/kabbalah/library/Software/Linux/Blackmagic/DaVinci_Resolve_Studio_*.run -iy" > /install_Resolve.sh
+	echo ------------------------------------------
+	echo  open new Terminal as a user and run this
+	echo ------------------------------------------
+	echo /mnt/kabbalah/library/Software/Linux/Blackmagic/DaVinci_Resolve_Studio_*.run -iy
+	read -p "Press [Enter] key to continue..."
+# firefox - centos repos don't include latest firefox
+	yum remove firefox
+	FIREFOX_LOCAL="/mnt/kabbalah/library/Software/Linux/Firefox/firefox.tar.bz2"
+	FIREFOX_REMOTE="https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US"
+	wget -q $FIREFOX_REMOTE -O $FIREFOX_LOCAL
+	cd /opt
+	tar xvjf $FIREFOX_LOCAL
+	sudo ln -s /opt/firefox/firefox /usr/bin/firefox
 # GitAhead
 	cd /opt/
 	/mnt/kabbalah/library/Software/Linux/GitAhead/GitAhead*.sh -y
@@ -195,7 +208,36 @@ then
 ---------------------
 ICON_PATH='/home/davidabbott/.local/share/applications'
 
-#GitAhead
+# DaVinci
+cat > /usr/share/applications/com.blackmagicdesign.resolve.desktop<<EOF
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=DaVinci Resolve
+GenericName=DaVinci Resolve
+Comment=Revolutionary new tools for editing, visual effects, color correction and professional audio post production, all in a single application!
+Path=/opt/resolve/
+Exec=env QT_DEVICE_PIXEL_RATIO=2 /opt/resolve/bin/resolve %U
+Terminal=false
+MimeType=application/x-resolveproj;
+Icon=/opt/resolve/graphics/DV_Resolve.png
+StartupNotify=true
+Name[en_US]=DaVinci Resolve
+EOF
+
+# Firefox
+cat > $ICON_PATH/firefox.desktop <<EOF
+[Desktop Entry]
+Name=Firefox
+Comment=
+Exec="/opt/firefox/firefox"
+Terminal=false
+Icon=/opt/firefox/browser/chrome/icons/default/default128.png
+Type=Application
+Categories=GTK;WebBrowser;Network;
+EOF
+
+# GitAhead
 cat > $ICON_PATH/GitAhead.desktop <<EOF
 [Desktop Entry]
 Name=GitAhead
