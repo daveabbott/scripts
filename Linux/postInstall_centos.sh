@@ -47,16 +47,13 @@ then
 
 	yum install -y https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
 
-	yum install -y vlc
 	yum install -y ffmpeg compat-ffmpeg28				# compat allows firefox to play mp4
-	yum install -y handbrake-gui
 	yum install -y timeshift
 	yum install -y kmod-hfs kmod-hfsplus hfsplus-tools	# allows reading of mac drives. slow to install.
 	yum install -y qt-x11.x86_64						# required for Redshift Licencing Tool
 	yum install -y libpng12								# required for Redshift Licencing Tool
 	yum install -y redhat-lsb-core						# required for Redshift
-	yum install -y qt5-qtbase-devel						# required for Mocha and VLC
-	yum install -y gstreamer1-libav						# required for VLC
+	#yum install -y qt5-qtbase-devel						# required for Mocha and VLC
 	yum install -y nodejs								# required for Sublime CSS/HTML tidying
 # turbovnc
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
@@ -82,9 +79,21 @@ then
 # virtualbox
 	yum-config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo
 	yum install -y VirtualBox-6.0.x86_64
-# makemkv
-	#yum install -y makemkv libdvdcss
-	#echo "T-UWwbYn781f1gjZcH5NOsJkGgWHnUkQsr2IduoSJ8sssNXOqclsWhowNWTclkBjHIMH" > /makemkv-betakey.txt
+# flathub
+	flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+	flatpak install -y flathub fr.handbrake.ghb
+	flatpak install -y flathub com.makemkv.MakeMKV
+#	flatpak install -y flathub org.mozilla.firefox
+	flatpak install -y flathub org.videolan.VLC
+	flatpak install -y flathub org.DolphinEmu.dolphin-emu
+	flatpak install -y flathub org.libretro.RetroArch
+	flatpak install -y flathub org.blender.Blender
+	flatpak install -y flathub fr.natron.Natron
+	flatpak install -y flathub com.rawtherapee.RawTherapee
+	flatpak install -y flathub io.github.RodZill4.Material-Maker
+#	flatpak install -y flathub us.zoom.Zoom
+
+
 fi
 
 read -p "Change System Settings? " -n 1 -r
@@ -204,6 +213,21 @@ then
 	echo "HOST 192.168.3.2 any 4101" > $RLM/wireguard.lic
 	echo "HOST 192.168.69.4 any 4101" > $RLM/ethernet.lic
 
+# MakeMKV
+cat > /home/davidabbott/.MakeMKV/settings.conf<<EOF
+#
+# MakeMKV settings file, written by MakeMKV v1.15.1 linux(x64-release)
+#
+
+app_DestinationDir = ""
+app_InterfaceLanguage = "eng"
+app_Java = ""
+app_Key = "T-UWwbYn781f1gjZcH5NOsJkGgWHnUkQsr2IduoSJ8sssNXOqclsWhowNWTclkBjHIMH"
+app_PreferredLanguage = "eng"
+app_ccextractor = ""
+sdf_Stop = ""
+EOF
+
 ## Icons
 ---------------------
 ICON_PATH='/home/davidabbott/.local/share/applications'
@@ -275,26 +299,26 @@ Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
 # Nuke 12
-cat > $ICON_PATH/Nuke12.1v1.desktop <<EOF
+cat > $ICON_PATH/Nuke12.1v2.desktop <<EOF
 [Desktop Entry]
-Name=Nuke12.1v1
-Exec=env QT_SCALE_FACTOR=1.5 /opt/Nuke12.1v1/Nuke12.1
+Name=Nuke12.1v2
+Exec=env QT_SCALE_FACTOR=1.5 /opt/Nuke12.1v2/Nuke12.1
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
-Icon=/opt/Nuke12.1v1/plugins/icons/NukeApp48.png
+Icon=/opt/Nuke12.1v2/plugins/icons/NukeApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
-cat > $ICON_PATH/NukeX12.1v1.desktop <<EOF
+cat > $ICON_PATH/NukeX12.1v2.desktop <<EOF
 [Desktop Entry]
-Name=NukeX12.1v1
-Exec=env QT_SCALE_FACTOR=1.5 /opt/Nuke12.1v1/Nuke12.1 -b --nukex %f
+Name=NukeX12.1v2
+Exec=env QT_SCALE_FACTOR=1.5 /opt/Nuke12.1v2/Nuke12.1 -b --nukex %f
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
-Icon=/opt/Nuke12.1v1/plugins/icons/NukeXApp48.png
+Icon=/opt/Nuke12.1v2/plugins/icons/NukeXApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
