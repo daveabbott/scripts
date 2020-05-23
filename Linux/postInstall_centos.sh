@@ -55,6 +55,7 @@ then
 	yum install -y redhat-lsb-core						# required for Redshift
 	#yum install -y qt5-qtbase-devel						# required for Mocha and VLC
 	yum install -y nodejs								# required for Sublime CSS/HTML tidying
+	yum install -y alien rpmrebuild						# allows for .deb to be rebuilt as .rpm
 # turbovnc
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
 	yum-config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
@@ -64,36 +65,47 @@ then
 	yum-config-manager --add-repo=https://virtualgl.org/pmwiki/uploads/Downloads/VirtualGL.repo
 	yum install -y VirtualGL
 # spotify
-	yum-config-manager --add-repo=https://negativo17.org/repos/epel-spotify.repo
-	yum install -y spotify-client
+#	yum-config-manager --add-repo=https://negativo17.org/repos/epel-spotify.repo
+#	yum install -y spotify-client
 # steam
-	rpm --import https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
-	yum-config-manager --add-repo=https://negativo17.org/repos/epel-steam.repo
+#	rpm --import https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
+#	yum-config-manager --add-repo=https://negativo17.org/repos/epel-steam.repo
 # sublime
 	rpm --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
 	yum-config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
 	yum install -y sublime-text
+	yum install -y sublime-merge
 # wireguard
 	yum install -y yum-plugin-elrepo
 	yum install -y kmod-wireguard wireguard-tools
 # virtualbox
 	yum-config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo
 	yum install -y VirtualBox-6.0.x86_64
-# flathub
+# flatpaks
 	flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
 	flatpak install -y flathub fr.handbrake.ghb
 	flatpak install -y flathub com.makemkv.MakeMKV
-#	flatpak install -y flathub org.mozilla.firefox
 	flatpak install -y flathub org.videolan.VLC
-	flatpak install -y flathub org.DolphinEmu.dolphin-emu
-	flatpak install -y flathub org.libretro.RetroArch
+	flatpak install -y flathub com.spotify.Client
+
+#	flatpak install -y flathub org.mozilla.firefox
+
 	flatpak install -y flathub org.blender.Blender
+	flatpak override --filesystem=/mnt/DATUMS/SCRATCH/blender org.blender.Blender
+
 	flatpak install -y flathub fr.natron.Natron
+
 	flatpak install -y flathub com.rawtherapee.RawTherapee
+
 	flatpak install -y flathub io.github.RodZill4.Material-Maker
+
 #	flatpak install -y flathub us.zoom.Zoom
 
-
+	flatpak install flathub com.valvesoftware.Steam
+	flatpak override --filesystem=/mnt/ATHENAEUM/Steam com.valvesoftware.Steam
+	flatpak install -y flathub org.DolphinEmu.dolphin-emu
+	flatpak install -y flathub org.libretro.RetroArch
 fi
 
 read -p "Change System Settings? " -n 1 -r
