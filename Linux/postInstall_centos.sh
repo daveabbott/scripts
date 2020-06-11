@@ -32,7 +32,7 @@ then
 	yum install -y dkms
 # nvidia
 	yum-config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-rhel7.repo
-	yum -y install nvidia-driver-latest-dkms nvidia settings cuda
+	yum -y install nvidia-driver-latest-dkms nvidia-settings cuda
 	export PATH=/usr/local/cuda-10.2/bin:/usr/local/cuda-10.2/NsightCompute-2019.1${PATH:+:${PATH}}
 	echo "blacklist nouveau" > /etc/modprobe.d/blacklist.conf
 	dracut --force
@@ -41,9 +41,9 @@ then
 	yum update -y
 # repos
 	yum localinstall -y --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
-	sed -i '/gpgcheck=1/a exclude=*nvidia* *cuda*' /etc/yum.repos.d/rpmfusion-free*.repo
+		sed -i '/gpgcheck=1/a exclude=*nvidia* *cuda*' /etc/yum.repos.d/rpmfusion-free*.repo
 	yum localinstall -y --nogpgcheck https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
-	sed -i '/gpgcheck=1/a exclude=*nvidia* *cuda*' /etc/yum.repos.d/rpmfusion-nonfree*.repo
+		sed -i '/gpgcheck=1/a exclude=*nvidia* *cuda*' /etc/yum.repos.d/rpmfusion-nonfree*.repo
 
 	yum install -y https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
 
@@ -64,12 +64,6 @@ then
 	rpm --import https://www.virtualgl.org/key/VGL-GPG-KEY
 	yum-config-manager --add-repo=https://virtualgl.org/pmwiki/uploads/Downloads/VirtualGL.repo
 	yum install -y VirtualGL
-# spotify
-#	yum-config-manager --add-repo=https://negativo17.org/repos/epel-spotify.repo
-#	yum install -y spotify-client
-# steam
-#	rpm --import https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
-#	yum-config-manager --add-repo=https://negativo17.org/repos/epel-steam.repo
 # sublime
 	rpm --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
 	yum-config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
@@ -83,29 +77,36 @@ then
 	yum install -y VirtualBox-6.0.x86_64
 # flatpaks
 	flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-
+	# internet
+	flatpak install -y flathub com.bitwarden.desktop
+	flatpak install -y flathub org.mozilla.firefox
+	flatpak install -y flathub org.mozilla.Thunderbird
+	flatpak install -y flathub com.slack.Slack
+	flatpak install -y flathub us.zoom.Zoom
+	# media
 	flatpak install -y flathub fr.handbrake.ghb
 	flatpak install -y flathub com.makemkv.MakeMKV
 	flatpak install -y flathub org.videolan.VLC
+		sed -i '/Exec=/c Exec=env QT_AUTO_SCREEN_SCALE_FACTOR=0 /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=/app/bin/vlc --file-forwarding org.videolan.VLC --started-from-file @@u %U @@' /var/lib/flatpak/exports/share/applications/org.videolan.VLC.desktop
 	flatpak install -y flathub com.spotify.Client
-
-#	flatpak install -y flathub org.mozilla.firefox
-
-	flatpak install -y flathub org.blender.Blender
-	flatpak override --filesystem=/mnt/DATUMS/SCRATCH/blender org.blender.Blender
-
-	flatpak install -y flathub fr.natron.Natron
-
-	flatpak install -y flathub com.rawtherapee.RawTherapee
-
-	flatpak install -y flathub io.github.RodZill4.Material-Maker
-
-#	flatpak install -y flathub us.zoom.Zoom
-
+		sed -i '/Exec=/c Exec=/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=spotify --file-forwarding com.spotify.Client --force-device-scale-factor=1.5 @@u %U @@' /var/lib/flatpak/exports/share/applications/com.spotify.Client.desktop
+	# vfx
+	flatpak install -y flathub org.blender.Blender 											# blender
+		flatpak override --filesystem=/mnt/DATUMS/SCRATCH/blender org.blender.Blender
+	flatpak install -y flathub fr.natron.Natron												# nuke clone
+	flatpak install -y flathub com.rawtherapee.RawTherapee									# raw image processor
+	flatpak install -y flathub io.github.RodZill4.Material-Maker							# Substance Designer clone
+	flatpak install -y flathuborg.gimp.GIMP													# gimp
+	flatpak install -y flathub org.dust3d.dust3d											# 3d modelling tool
+	# gaming
 	flatpak install flathub com.valvesoftware.Steam
-	flatpak override --filesystem=/mnt/ATHENAEUM/Steam com.valvesoftware.Steam
+		flatpak override --filesystem=/mnt/ATHENAEUM/Steam com.valvesoftware.Steam
 	flatpak install -y flathub org.DolphinEmu.dolphin-emu
 	flatpak install -y flathub org.libretro.RetroArch
+	# tools
+	flatpak install -y flathub com.github.tchx84.Flatseal
+	flatpak install -y flathub com.uploadedlobster.peek
+	flatpak install -y flathub org.gnome.OCRFeeder
 fi
 
 read -p "Change System Settings? " -n 1 -r
@@ -163,58 +164,64 @@ read -p "Run Installers? " -n 1 -r
 echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
+# # #
+REPO_PATH="/mnt/kabbalah/library/Software/Linux"
+# # #
 # PFtrack
-	yum install -y /mnt/kabbalah/library/Software/Linux/PixelFarm/pftrack-2016*.rpm
-	yum install -y /mnt/kabbalah/library/Software/Linux/PixelFarm/pfmanager-2018*.rpm
+	yum install -y $REPO_PATH/PixelFarm/pftrack-2016*.rpm
+	yum install -y $REPO_PATH/PixelFarm/pfmanager-2018*.rpm
 # DJV
 	yum install -y /mnt/kabbalah/library/Software/Linux/DJV/DJV*.rpm
 # Deadline
-	/mnt/kabbalah/library/Software/Linux/Thinkbox/DeadlineClient*.run --mode unattended --licensemode LicenseFree --connectiontype Remote --proxyrootdir 192.168.69.20:2847 --slavestartup true --launcherdaemon false
+	$REPO_PATH/Thinkbox/DeadlineClient*.run --mode unattended --licensemode LicenseFree --connectiontype Remote --proxyrootdir 192.168.69.20:2847 --slavestartup true --launcherdaemon false
 # DaVinci Resolve
 	# this needs to be installed as a user and not as root. Run the script this creates at /.
 	echo ------------------------------------------
 	echo  open new Terminal as a user and run this
 	echo ------------------------------------------
-	echo /mnt/kabbalah/library/Software/Linux/Blackmagic/DaVinci_Resolve_Studio_*.run -iy
+	echo $REPO_PATH/Blackmagic/DaVinci_Resolve_Studio_*.run -iy
 	read -p "Press [Enter] key to continue..."
-# firefox - centos repos don't include latest firefox
-	yum remove firefox
-	FIREFOX_LOCAL="/mnt/kabbalah/library/Software/Linux/Firefox/firefox.tar.bz2"
-	FIREFOX_REMOTE="https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US"
-	wget -q $FIREFOX_REMOTE -O $FIREFOX_LOCAL
-	cd /opt
-	tar xvjf $FIREFOX_LOCAL
-	sudo ln -s /opt/firefox/firefox /usr/bin/firefox
+# # firefox - centos repos don't include latest firefox
+# 	yum remove firefox
+# 	FIREFOX_LOCAL="/mnt/kabbalah/library/Software/Linux/Firefox/firefox.tar.bz2"
+# 	FIREFOX_REMOTE="https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US"
+# 	wget -q $FIREFOX_REMOTE -O $FIREFOX_LOCAL
+# 	cd /opt
+# 	tar xvjf $FIREFOX_LOCAL
+# 	sudo ln -s /opt/firefox/firefox /usr/bin/firefox
 # GitAhead
 	cd /opt/
 	/mnt/kabbalah/library/Software/Linux/GitAhead/GitAhead*.sh -y
+# Houdini
+	HOUDINI18="$REPO_PATH/SideFX/houdini*/houdini.install"
+	$HOUDINI18 --accept-EULA
 # Mocha
-	yum install -y /mnt/kabbalah/library/Software/Linux/ImagineerSystems/MochaPro2020*.rpm
+	yum install -y $REPO_PATH/ImagineerSystems/MochaPro2020*.rpm
 # NeatVideo
 	/mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console
 # Nuke10.5
-	NUKE10="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-10.5*.run"
+	NUKE10="$REPO_PATH/Foundry/Nuke-10.5*.run"
 	chmod +x $NUKE10
 	mkdir /opt/Nuke10.5v4 && cd $_
 	unzip $NUKE10
 # Nuke12.0
-	NUKE12="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-12.0*.run"
+	NUKE12="$REPO_PATH/Foundry/Nuke-12.0*.run"
 	chmod +x $NUKE12
 	cd /opt
 	$NUKE12 --accept-foundry-eula
 # Nuke12.1
-	NUKE12="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-12.1*.run"
+	NUKE12="$REPO_PATH/Foundry/Nuke-12.1*.run"
 	chmod +x $NUKE12
 	cd /opt
 	$NUKE12 --accept-foundry-eula
 # Redshift
-	/mnt/kabbalah/library/Software/Linux/Redshift/redshift_v2.6.5*.run --quiet
-# Slack
-	yum install -y /mnt/kabbalah/library/Software/Linux/Slack/slack*.rpm
-# Zoom
-	RPM_ZOOM="/mnt/kabbalah/library/Software/Linux/Zoom/zoom_x86_64.rpm"
-	wget -q https://zoom.us/client/latest/zoom_x86_64.rpm -O $RPM_ZOOM
-	yum install -y $RPM_ZOOM
+	$REPO_PATH/Redshift/redshift_v2.6.5*.run --quiet
+# # Slack
+# 	yum install -y /mnt/kabbalah/library/Software/Linux/Slack/slack*.rpm
+# # Zoom
+# 	RPM_ZOOM="/mnt/kabbalah/library/Software/Linux/Zoom/zoom_x86_64.rpm"
+# 	wget -q https://zoom.us/client/latest/zoom_x86_64.rpm -O $RPM_ZOOM
+# 	yum install -y $RPM_ZOOM
 
 ## Licenses
 ---------------------
@@ -348,6 +355,20 @@ Type=Application
 Categories=Graphics;
 EOF
 
+# # Unreal
+# cat > $ICON_PATH/Unreal.desktop << EOF
+# [Desktop Entry]
+# Name=Unreal Editor
+# Comment=
+# Exec=/mnt/ATHENAUEM/GitHub/UnrealEngine/Engine/Binaries/Linux/Unreal/UE4Editor
+# Terminal=true
+# MimeType=application/unreal;
+# Icon=/mnt/ATHENAEUM/GitHub/UnrealEngine/Engine/Source/Programs/PrereqInstaller/Resources/Setup.ico
+# Type=Application
+# Categories=Graphics;
+# EOF
+
+
 ## Mimetypes
 ---------------------
 # Mocha
@@ -377,5 +398,36 @@ EOF
 # Update Mime
 	update-mime-database /usr/share/mime
 fi
+
+# GitHub
+# houdini
+# git clone https://github.com/qLab/qLib.git
+# git clone https://github.com/toadstorm/MOPS.git
+# git clone https://github.com/sideeffects/GameDevelopmentToolset.git
+
+# Environment variables
+# houdini
+# HOUDINI_ENV="/home/davidabbott/houdini18.0/houdini.env"
+# cat > $HOUDINI_ENV << EOF
+# HOUDINI_NO_SPLASH = 1
+# HOUDINI_DSO_ERROR = 2
+
+# DEADLINE = $HOME/Thinkbox/Deadline10/submitters/HoudiniSubmitter
+
+# GAMEDEV = $HOME/GitHub/GameDevelopmentToolset
+
+# MOPS = $HOME/GitHub/MOPS
+
+# QLIB = $HOME/GitHub/qLib
+# QOTL = $QLIB/otls
+
+# REDSHIFT = /usr/redshift/bin
+# REDSHIFT4HOUDINI = /usr/redshift/redshift4houdini/${HOUDINI_VERSION}
+
+# HOUDINI_OTLSCAN_PATH = $QOTL/base:$QOTL/future:$QOTL/experimental:$HOUDINI_OTLSCAN_PATH:&
+# HOUDINI_PATH = $HOUDINI_PATH:$DEADLINE:$GAMEDEV:$MOPS:$QLIB:$REDSHIFT4HOUDINI:&
+# PATH = $GAMEDEV/bin:$REDSHIFT:$PATH
+# HOUDINI_MENU_PATH = $HOUDINI_MENU_PATH:$DEADLINE:&
+# EOF
 
 exit 0
