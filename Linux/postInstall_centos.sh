@@ -193,6 +193,7 @@ REPO_PATH="/mnt/kabbalah/library/Software"
 	read -p "Press [Enter] key to continue..."
 # GitAhead
 	cd /opt/
+	chmod +x $REPO_PATH/GitAhead/GitAhead*.sh
 	$REPO_PATH/GitAhead/GitAhead*.sh -y
 # Houdini
 	HOUDINI18="$REPO_PATH/SideFX/houdini*/houdini.install"
