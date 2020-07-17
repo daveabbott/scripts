@@ -23,6 +23,17 @@ read -p "Setup yum? " -n 1 -r
 echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
+# remove
+	yum remove -y gnome-weather
+	yum remove -y boxes
+	yum remove -y rhythmbox
+	yum remove -y empathy
+	yum remove -y cheese
+	yum remove -y ekiga
+	yum remove -y evolution
+	yum remove -y gnome-contacts
+	yum remove -y firefox 		# centos firefox doesn't update very quickly. Reinstalling from Flathub below.
+# install
 	yum makecache
 	yum install -y epel-release yum-utils
 	yum install -y deltarpm
@@ -53,9 +64,11 @@ then
 	yum install -y qt-x11.x86_64						# required for Redshift Licencing Tool
 	yum install -y libpng12								# required for Redshift Licencing Tool
 	yum install -y redhat-lsb-core						# required for Redshift
-	#yum install -y qt5-qtbase-devel						# required for Mocha and VLC
 	yum install -y nodejs								# required for Sublime CSS/HTML tidying
 	yum install -y alien rpmrebuild						# allows for .deb to be rebuilt as .rpm
+# balena etcher
+	yum-config-manager --add-repo=https://balena.io/etcher/static/etcher-rpm.repo
+	yum install -y balena-etcher-electron
 # turbovnc
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
 	yum-config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
@@ -77,20 +90,17 @@ then
 	yum install -y VirtualBox-6.0.x86_64
 # flatpaks
 	flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-	# internet
 	flatpak install -y flathub com.bitwarden.desktop
 	flatpak install -y flathub org.mozilla.firefox
 	flatpak install -y flathub org.mozilla.Thunderbird
 	flatpak install -y flathub com.slack.Slack
 	flatpak install -y flathub us.zoom.Zoom
-	# media
 	flatpak install -y flathub fr.handbrake.ghb
 	flatpak install -y flathub com.makemkv.MakeMKV
 	flatpak install -y flathub org.videolan.VLC
 		sed -i '/Exec=/c Exec=env QT_AUTO_SCREEN_SCALE_FACTOR=0 /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=/app/bin/vlc --file-forwarding org.videolan.VLC --started-from-file @@u %U @@' /var/lib/flatpak/exports/share/applications/org.videolan.VLC.desktop
 	flatpak install -y flathub com.spotify.Client
 		sed -i '/Exec=/c Exec=/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=spotify --file-forwarding com.spotify.Client --force-device-scale-factor=1.5 @@u %U @@' /var/lib/flatpak/exports/share/applications/com.spotify.Client.desktop
-	# vfx
 	flatpak install -y flathub org.blender.Blender 											# blender
 		flatpak override --filesystem=/mnt/DATUMS/SCRATCH/blender org.blender.Blender
 	flatpak install -y flathub fr.natron.Natron												# nuke clone
@@ -98,12 +108,12 @@ then
 	flatpak install -y flathub io.github.RodZill4.Material-Maker							# Substance Designer clone
 	flatpak install -y flathuborg.gimp.GIMP													# gimp
 	flatpak install -y flathub org.dust3d.dust3d											# 3d modelling tool
-	# gaming
 	flatpak install flathub com.valvesoftware.Steam
 		flatpak override --filesystem=/mnt/ATHENAEUM/Steam com.valvesoftware.Steam
+		flatpak override --filesystem=/opt com.valvesoftware.Steam
+		flatpak override --filesystem=/home/davidabbott/.local/share/applications com.valvesoftware.Steam
 	flatpak install -y flathub org.DolphinEmu.dolphin-emu
 	flatpak install -y flathub org.libretro.RetroArch
-	# tools
 	flatpak install -y flathub com.github.tchx84.Flatseal
 	flatpak install -y flathub com.uploadedlobster.peek
 	flatpak install -y flathub org.gnome.OCRFeeder
@@ -165,7 +175,7 @@ echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 # # #
-REPO_PATH="/mnt/kabbalah/library/Software/Linux"
+REPO_PATH="/mnt/kabbalah/library/Software"
 # # #
 # PFtrack
 	yum install -y $REPO_PATH/PixelFarm/pftrack-2016*.rpm
@@ -181,39 +191,42 @@ REPO_PATH="/mnt/kabbalah/library/Software/Linux"
 	echo ------------------------------------------
 	echo $REPO_PATH/Blackmagic/DaVinci_Resolve_Studio_*.run -iy
 	read -p "Press [Enter] key to continue..."
-# # firefox - centos repos don't include latest firefox
-# 	yum remove firefox
-# 	FIREFOX_LOCAL="/mnt/kabbalah/library/Software/Linux/Firefox/firefox.tar.bz2"
-# 	FIREFOX_REMOTE="https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US"
-# 	wget -q $FIREFOX_REMOTE -O $FIREFOX_LOCAL
-# 	cd /opt
-# 	tar xvjf $FIREFOX_LOCAL
-# 	sudo ln -s /opt/firefox/firefox /usr/bin/firefox
 # GitAhead
 	cd /opt/
-	/mnt/kabbalah/library/Software/Linux/GitAhead/GitAhead*.sh -y
+	$REPO_PATH/GitAhead/GitAhead*.sh -y
 # Houdini
 	HOUDINI18="$REPO_PATH/SideFX/houdini*/houdini.install"
 	$HOUDINI18 --accept-EULA
 # Mocha
 	yum install -y $REPO_PATH/ImagineerSystems/MochaPro2020*.rpm
 # NeatVideo
-	/mnt/kabbalah/library/Software/Linux/NeatVideo/NeatVideo*.run --mode console
+	$REPO_PATH/NeatVideo/NeatVideo*.run --mode console
+# NoMachine
+	yum install -y @$REPO_PATH/NoMachine/
+# Nuke
+	# version control
+	NUKE10="Nuke10.5v4"
+	NUKE11="Nuke11.3v3"
+	NUKE12="Nuke12.1v4"
+
+	NUKEX10="NukeX10.5v4"
+	NUKEX11="NukeX11.3v3"
+	NUKEX12="NukeX12.1v4"
 # Nuke10.5
-	NUKE10="$REPO_PATH/Foundry/Nuke-10.5*.run"
-	chmod +x $NUKE10
-	mkdir /opt/Nuke10.5v4 && cd $_
-	unzip $NUKE10
-# Nuke12.0
-	NUKE12="$REPO_PATH/Foundry/Nuke-12.0*.run"
-	chmod +x $NUKE12
-	cd /opt
-	$NUKE12 --accept-foundry-eula
+	NUKE_RUN="$REPO_PATH/Nuke/Nuke-10.5/Nuke-10.5*.run"
+	chmod +x $NUKE_RUN
+	mkdir /opt/$NUKE10 && cd $_
+	unzip $NUKE_RUN
+# Nuke11.3
+	NUKE_RUN="$REPO_PATH/Nuke/Nuke11.3/Nuke-11.3*.run"
+	chmod +x $NUKE_RUN
+	mkdir /opt/$NUKE11 && cd $_
+	unzip $NUKE_RUN
 # Nuke12.1
-	NUKE12="$REPO_PATH/Foundry/Nuke-12.1*.run"
-	chmod +x $NUKE12
+	NUKE_RUN="$REPO_PATH/Nuke/Nuke12.1/Nuke-12.1*.run"
+	chmod +x $NUKE_RUN
 	cd /opt
-	$NUKE12 --accept-foundry-eula
+	$NUKE_RUN --accept-foundry-eula
 # Redshift
 	$REPO_PATH/Redshift/redshift_v2.6.5*.run --quiet
 # # Slack
@@ -293,51 +306,51 @@ Categories=Development;
 EOF
 
 # Nuke 10
-cat > $ICON_PATH/Nuke10.5v4.desktop <<EOF
+cat > $ICON_PATH/$NUKE10.desktop <<EOF
 [Desktop Entry]
-Name=Nuke10.5v4
+Name=$NUKE10
 Comment=
-Exec=/opt/Nuke10.5v4/Nuke10.5 -q
+Exec=/opt/$NUKE10/Nuke10.5 -q
 Terminal=true
 MimeType=application/x-nuke;
-Icon=/opt/Nuke10.5v4/plugins/icons/NukeApp48.png
+Icon=/opt/$NUKE10/plugins/icons/NukeApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
-cat > $ICON_PATH/NukeX10.5v4.desktop <<EOF
+cat > $ICON_PATH/$NUKEX10.desktop <<EOF
 [Desktop Entry]
-Name=NukeX10.5v4
+Name=$NUKEX10
 Comment=
-Exec=/opt/Nuke10.5v4/Nuke10.5 -q --nukex
+Exec=/opt/$NUKE10/Nuke10.5 -q --nukex
 Terminal=true
 MimeType=application/x-nuke;
-Icon=/opt/Nuke10.5v4/plugins/icons/NukeXApp48.png
+Icon=/opt/$NUKE10/plugins/icons/NukeXApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
 # Nuke 12
-cat > $ICON_PATH/Nuke12.1v2.desktop <<EOF
+cat > $ICON_PATH/$NUKE12.desktop <<EOF
 [Desktop Entry]
-Name=Nuke12.1v2
-Exec=env QT_SCALE_FACTOR=1.5 /opt/Nuke12.1v2/Nuke12.1
+Name=$NUKE12
+Exec=env QT_SCALE_FACTOR=1.5 /opt/$NUKE12/Nuke12.1
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
-Icon=/opt/Nuke12.1v2/plugins/icons/NukeApp48.png
+Icon=/opt/$NUKE12/plugins/icons/NukeApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
-cat > $ICON_PATH/NukeX12.1v2.desktop <<EOF
+cat > $ICON_PATH/$NUKEX12.desktop <<EOF
 [Desktop Entry]
-Name=NukeX12.1v2
-Exec=env QT_SCALE_FACTOR=1.5 /opt/Nuke12.1v2/Nuke12.1 -b --nukex %f
+Name=$NUKEX12
+Exec=env QT_SCALE_FACTOR=1.5 /opt/$NUKE12/Nuke12.1 -b --nukex %f
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
-Icon=/opt/Nuke12.1v2/plugins/icons/NukeXApp48.png
+Icon=/opt/$NUKE12/plugins/icons/NukeXApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
@@ -367,7 +380,6 @@ EOF
 # Type=Application
 # Categories=Graphics;
 # EOF
-
 
 ## Mimetypes
 ---------------------
