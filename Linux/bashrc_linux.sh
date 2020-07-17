@@ -17,7 +17,7 @@ alias reboot='sudo /sbin/reboot'
 alias shutdown='sudo /sbin/shutdown'
 
 # applications
-alias houdini="/opt/hfs17.5/bin/happrentice"
+alias houdini="/opt/hfs18.0/bin/hindie"
 alias resolve="/opt/resolve/bin/resolve"
 
 # virtualgl
@@ -38,11 +38,14 @@ alias turbok="/opt/TurboVNC/bin/vncserver -kill :1"
 #########################################################
 
 # ocio
-export OCIO="/opt/Nuke12.1v1/plugins/OCIOConfigs/configs/aces_1.1/config.ocio"
+# export OCIO="/opt/Nuke12.1v1/plugins/OCIOConfigs/configs/aces_1.1/config.ocio"
 
 # redshift
 # export REDSHIFT_PATHOVERRIDE_FILE=/mnt/SSD_1TB/GitHub/scripts/redshift/redshift_pathmapping.txt
 
 # makemkv and vlc
-export LIBBDPLUS_PATH=/usr/lib64/libmmbd.so.0
-export LIBAACS_PATH=/usr/lib64/libmmbd.so.0
+# export LIBBDPLUS_PATH=/usr/lib64/libmmbd.so.0
+# export LIBAACS_PATH=/usr/lib64/libmmbd.so.0
+
+export LC_COLLATE=C
+#LC_COLLATE=en_US.ASCII
