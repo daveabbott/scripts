@@ -185,10 +185,9 @@ REPO_PATH="/mnt/kabbalah/library/Software"
 # Deadline
 	$REPO_PATH/Thinkbox/DeadlineClient*.run --mode unattended --licensemode LicenseFree --connectiontype Remote --proxyrootdir 192.168.69.20:2847 --slavestartup true --launcherdaemon false
 # DaVinci Resolve
-	# this needs to be installed as a user and not as root. Run the script this creates at /.
-	echo ------------------------------------------
-	echo  open new Terminal as a user and run this
-	echo ------------------------------------------
+	echo -------------------------------------------------
+	echo  open new Terminal window as a user and run this
+	echo -------------------------------------------------
 	echo $REPO_PATH/Blackmagic/DaVinci_Resolve_Studio_*.run -iy
 	read -p "Press [Enter] key to continue..."
 # GitAhead
@@ -196,10 +195,12 @@ REPO_PATH="/mnt/kabbalah/library/Software"
 	chmod +x $REPO_PATH/GitAhead/GitAhead*.sh
 	$REPO_PATH/GitAhead/GitAhead*.sh -y
 # Houdini
-	HOUDINI18="$REPO_PATH/SideFX/houdini*/houdini.install"
-	$HOUDINI18 --accept-EULA
+	cd /tmp
+	tar -xvf /mnt/kabbalah/library/Software/Houdini/houdini*linux*.tar.gz
+	HOUDINI="/tmp/houdini*linux*/houdini.install"
+	$HOUDINI --accept-EULA
 # Mocha
-	yum install -y $REPO_PATH/ImagineerSystems/MochaPro2020*.rpm
+	yum install -y $REPO_PATH/ImagineerSystems/MochaPro*.rpm
 # NeatVideo
 	$REPO_PATH/NeatVideo/NeatVideo*.run --mode console
 # NoMachine
@@ -230,12 +231,6 @@ REPO_PATH="/mnt/kabbalah/library/Software"
 	$NUKE_RUN --accept-foundry-eula
 # Redshift
 	$REPO_PATH/Redshift/redshift_v2.6.5*.run --quiet
-# # Slack
-# 	yum install -y /mnt/kabbalah/library/Software/Linux/Slack/slack*.rpm
-# # Zoom
-# 	RPM_ZOOM="/mnt/kabbalah/library/Software/Linux/Zoom/zoom_x86_64.rpm"
-# 	wget -q https://zoom.us/client/latest/zoom_x86_64.rpm -O $RPM_ZOOM
-# 	yum install -y $RPM_ZOOM
 
 ## Licenses
 ---------------------
