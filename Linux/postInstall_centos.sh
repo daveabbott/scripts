@@ -98,8 +98,10 @@ then
 	flatpak install -y flathub fr.handbrake.ghb
 	flatpak install -y flathub com.makemkv.MakeMKV
 	flatpak install -y flathub org.videolan.VLC
+		# add HiDPI support to app shortcut
 		sed -i '/Exec=/c Exec=env QT_AUTO_SCREEN_SCALE_FACTOR=0 /usr/bin/flatpak run --branch=stable --arch=x86_64 --command=/app/bin/vlc --file-forwarding org.videolan.VLC --started-from-file @@u %U @@' /var/lib/flatpak/exports/share/applications/org.videolan.VLC.desktop
 	flatpak install -y flathub com.spotify.Client
+		# add HiDPI support to app shortcut
 		sed -i '/Exec=/c Exec=/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=spotify --file-forwarding com.spotify.Client --force-device-scale-factor=1.5 @@u %U @@' /var/lib/flatpak/exports/share/applications/com.spotify.Client.desktop
 	flatpak install -y flathub org.blender.Blender 											# blender
 		flatpak override --filesystem=/mnt/DATUMS/SCRATCH/blender org.blender.Blender
@@ -109,14 +111,18 @@ then
 	flatpak install -y flathuborg.gimp.GIMP													# gimp
 	flatpak install -y flathub org.dust3d.dust3d											# 3d modelling tool
 	flatpak install flathub com.valvesoftware.Steam
+		# add extra folder permisions
 		flatpak override --filesystem=/mnt/ATHENAEUM/Steam com.valvesoftware.Steam
 		flatpak override --filesystem=/opt com.valvesoftware.Steam
 		flatpak override --filesystem=/home/davidabbott/.local/share/applications com.valvesoftware.Steam
 	flatpak install -y flathub org.DolphinEmu.dolphin-emu
 	flatpak install -y flathub org.libretro.RetroArch
 	flatpak install -y flathub com.github.tchx84.Flatseal
-	flatpak install -y flathub com.uploadedlobster.peek
-	flatpak install -y flathub org.gnome.OCRFeeder
+	#flatpak install -y flathub com.uploadedlobster.peek
+	#flatpak install -y flathub org.gnome.OCRFeeder
+	flatpak install -y flathub com.quixel.Bridge
+		# add extra folder permisions
+		flatpak override --filesystem=/mnt/kabbalah/library/Stock\ Assets/Megascans\ Library com.quixel.Bridge
 fi
 
 read -p "Change System Settings? " -n 1 -r
@@ -230,13 +236,13 @@ REPO_PATH="/mnt/kabbalah/library/Software"
 	cd /opt
 	$NUKE_RUN --accept-foundry-eula
 # Redshift
-	$REPO_PATH/Redshift/redshift_v2.6.5*.run --quiet
+	$REPO_PATH/Redshift/redshift_v2*.run --quiet
 
 ## Licenses
 ---------------------
 # Nuke
-	mkdir -p /usr/local/foundry/RLM/
 	RLM="/usr/local/foundry/RLM/"
+	mkdir -p $RLM
 	echo "HOST 192.168.69.2 any 4101" > $RLM/wifi.lic
 	echo "HOST 192.168.3.2 any 4101" > $RLM/wireguard.lic
 	echo "HOST 192.168.69.4 any 4101" > $RLM/ethernet.lic
