@@ -67,8 +67,18 @@ echo "|__/|__/_/_/ /_/\__,_/\____/|__/|__/____/   /____/\___/\__/\__/_/_/ /_/\__
 echo "                                                                      /____/        "
 echo ======================================================================================
 :: NOTES
+:: This part had to be done via Powershell as CMD wouldn't do it.
 pause
 color 0f
+
+:: ===================================POWERSHELL :: START==================================
+
+powershell
+
+Rename-Computer -NewName "double-rabbi"
+
+exit
+:: ====================================POWERSHELL :: END===================================
 
 :: ========================================================================================
 ::
@@ -113,6 +123,11 @@ wget 'https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-
 Set-Variable -Name "APP_NAME" -Value "Slack"
 mkdir $REPO_PATH\$APP_NAME
 wget 'https://slack.com/ssb/download-win64' -OutFile $REPO_PATH\$APP_NAME\$APP_NAME.exe
+
+# spotify
+Set-Variable -Name "APP_NAME" -Value "spotify"
+mkdir $REPO_PATH\$APP_NAME
+wget 'https://download.scdn.co/SpotifySetup.exe' -OutFile $REPO_PATH\$APP_NAME\$APP_NAME.exe
 
 exit
 
@@ -228,6 +243,14 @@ color 0f
     echo Complete. %APP_COUNT% of %APP_TOTAL% installed
 :: slack
     set APP_PATH=Slack
+    set APP_NAME=%APP_PATH%*.*
+    for /f "tokens=*" %%f in ('dir /b %REPO_PATH%\%APP_PATH%\%APP_NAME%') do (set FULL_PATH=%REPO_PATH%\%APP_PATH%\%%f)
+    echo Installing %FULL_PATH%...
+    START /WAIT %FULL_PATH% -s
+    set /a "APP_COUNT+=1"
+    echo Complete. %APP_COUNT% of %APP_TOTAL% installed
+:: spotify
+    set APP_PATH=Spotify
     set APP_NAME=%APP_PATH%*.*
     for /f "tokens=*" %%f in ('dir /b %REPO_PATH%\%APP_PATH%\%APP_NAME%') do (set FULL_PATH=%REPO_PATH%\%APP_PATH%\%%f)
     echo Installing %FULL_PATH%...
