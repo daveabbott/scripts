@@ -46,6 +46,18 @@ Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
+cat > $ICON_PATH/NukeStudio.desktop <<EOF
+[Desktop Entry]
+Name=NukeStudio
+Exec=env QT_SCALE_FACTOR=1.5 $NUKE_DEST/$NUKE_BIN --studio %f
+Comment=
+Terminal=true
+MimeType=application/x-nuke;
+Icon=$NUKE_DEST/$NUKE_VERSION/plugins/icons/NukeStudioApp48.png
+Type=Application
+Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
+EOF
+
 # set mimetype for .nk
 cat > /usr/share/mime/packages/project-nuke-script.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
