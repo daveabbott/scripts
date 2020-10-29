@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Ask for JOBNAME
 echo "Enter JOBNAME. No spaces!"
 read JOBNAME
@@ -24,21 +26,34 @@ JOBDATE=$(date +"%y%m%d")
 EOF
 
 # Create subfolders
-mkdir -p ./_output/{breakdown,masters,wip}
-mkdir -p ./_cache/{nuke/{EXR,JPG},houdini,redshift}
-mkdir -p ./_renders/{ae/"$JOBCODE"_{00..20}0,houdini/"$JOBCODE"_{00..20}0,mocha/"$JOBCODE"_{00..20}0,nuke/"$JOBCODE"_{00..20}0,resolve/{V1,V2,V3,V4}}
-mkdir -p ./assets/{audio,images,fonts,graphics,models,maps,video/{graded,rushes,selects},reference}
-mkdir -p ./project/{meshroom,pftrack,premiere,resolve,xml}
-mkdir -p ./shots/"$JOBCODE"_{00..20}0/{ae,blender,data,houdini,mocha,nuke,photoshop}
+mkdir -p ./_output/{breakdown,toGrade,toClient,wip}
+mkdir -p ./_input/{fromClient/$(date +"%y%m%d"),fromGrade/$(date +"%y%m%d")}
+mkdir -p ./_cache/{houdini,nuke/{EXR/{denoise,smartVectors},JPG/{denoise}},redshift}
+mkdir -p ./_renders/{ae,houdini,mocha,nuke,resolve}
+mkdir -p ./assets/{audio,images,fonts,graphics,hdri,models,maps,video,reference,rushes,xml}
+mkdir -p ./project/{meshroom,pftrack,photoshop,premiere,resolve}
+mkdir -p ./shots/"$JOBCODE"_{A..E}
 
-# Create empty placeholders
+# create shot folder within each sequence
 cd ./shots
 for dir in */ ; do
-    SHOTNAME=${dir%*/}
-    touch ./$SHOTNAME/ae/"$SHOTNAME"_v01.aep;
-    touch ./$SHOTNAME/blender/"$SHOTNAME"_v01.blend;
-    touch ./$SHOTNAME/houdini/"$SHOTNAME"_v01.hiplc;
-    touch ./$SHOTNAME/nuke/"$SHOTNAME"_comp_v01.nk;
+	SEQUENCE=${dir%*/}
+	cd $dir
+	mkdir -p ./"$SEQUENCE"_{00..20}0/{ae,blender,data/{cameras,tracking,scripts},houdini,mocha,nuke,photoshop}
+
+	# Create empty placeholders
+	for dir in */ ; do
+    	SHOTNAME=${dir%*/}
+		# after effects
+    	touch ./$SHOTNAME/ae/"$SHOTNAME"_v01.aep;
+		# blender
+    	touch ./$SHOTNAME/blender/"$SHOTNAME"_v01.blend;
+		# houdini
+    	touch ./$SHOTNAME/houdini/"$SHOTNAME"_v01.hiplc;
+		# nuke
+   		touch ./$SHOTNAME/nuke/"$SHOTNAME"_comp_v01.nk;
+   	done
+   	cd ./..
 done
 
 exit 0

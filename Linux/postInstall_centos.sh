@@ -66,6 +66,7 @@ then
 	yum install -y redhat-lsb-core						# required for Redshift
 	yum install -y nodejs								# required for Sublime CSS/HTML tidying
 	yum install -y alien rpmrebuild						# allows for .deb to be rebuilt as .rpm
+	yum install -y exfat-utils fuse-exfat				# enables read support for exfat
 # balena etcher
 	yum-config-manager --add-repo=https://balena.io/etcher/static/etcher-rpm.repo
 	yum install -y balena-etcher-electron
@@ -191,20 +192,20 @@ REPO_PATH="/mnt/kabbalah/library/Software"
 # Deadline
 	$REPO_PATH/Thinkbox/DeadlineClient*.run --mode unattended --licensemode LicenseFree --connectiontype Remote --proxyrootdir 192.168.69.20:2847 --slavestartup true --launcherdaemon false
 # DaVinci Resolve
-	echo -------------------------------------------------
-	echo  open new Terminal window as a user and run this
-	echo -------------------------------------------------
-	echo $REPO_PATH/Blackmagic/DaVinci_Resolve_Studio_*.run -iy
-	read -p "Press [Enter] key to continue..."
+	# echo -------------------------------------------------
+	# echo  open new Terminal window as a user and run this
+	# echo -------------------------------------------------
+	# echo $REPO_PATH/Blackmagic/DaVinci_Resolve_Studio_*.run -iy
+	# read -p "Press [Enter] key to continue..."
 # GitAhead
 	cd /opt/
 	chmod +x $REPO_PATH/GitAhead/GitAhead*.sh
 	$REPO_PATH/GitAhead/GitAhead*.sh -y
 # Houdini
-	cd /tmp
-	tar -xvf /mnt/kabbalah/library/Software/Houdini/houdini*linux*.tar.gz
-	HOUDINI="/tmp/houdini*linux*/houdini.install"
-	$HOUDINI --accept-EULA
+	# cd /tmp
+	# tar -xvf /mnt/kabbalah/library/Software/Houdini/houdini*linux*.tar.gz
+	# HOUDINI="/tmp/houdini*linux*/houdini.install"
+	# $HOUDINI --accept-EULA
 # Mocha
 	yum install -y $REPO_PATH/ImagineerSystems/MochaPro*.rpm
 # NeatVideo
@@ -215,22 +216,22 @@ REPO_PATH="/mnt/kabbalah/library/Software"
 	# version control
 	NUKE10="Nuke10.5v4"
 	NUKE11="Nuke11.3v3"
-	NUKE12="Nuke12.1v4"
+	NUKE12="Nuke12.2v2"
 
 	NUKEX10="NukeX10.5v4"
 	NUKEX11="NukeX11.3v3"
-	NUKEX12="NukeX12.1v4"
-# Nuke10.5
+	NUKEX12="NukeX12.2v2"
+# Nuke10
 	NUKE_RUN="$REPO_PATH/Nuke/Nuke-10.5/Nuke-10.5*.run"
 	chmod +x $NUKE_RUN
 	mkdir /opt/$NUKE10 && cd $_
 	unzip $NUKE_RUN
-# Nuke11.3
+# Nuke11
 	NUKE_RUN="$REPO_PATH/Nuke/Nuke11.3/Nuke-11.3*.run"
 	chmod +x $NUKE_RUN
 	mkdir /opt/$NUKE11 && cd $_
 	unzip $NUKE_RUN
-# Nuke12.1
+# Nuke12
 	NUKE_RUN="$REPO_PATH/Nuke/Nuke12.1/Nuke-12.1*.run"
 	chmod +x $NUKE_RUN
 	cd /opt
@@ -336,7 +337,7 @@ EOF
 cat > $ICON_PATH/$NUKE12.desktop <<EOF
 [Desktop Entry]
 Name=$NUKE12
-Exec=env QT_SCALE_FACTOR=1.5 /opt/$NUKE12/Nuke12.1
+Exec=env QT_SCALE_FACTOR=1.5 /opt/$NUKE12/Nuke12.2
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
@@ -348,7 +349,7 @@ EOF
 cat > $ICON_PATH/$NUKEX12.desktop <<EOF
 [Desktop Entry]
 Name=$NUKEX12
-Exec=env QT_SCALE_FACTOR=1.5 /opt/$NUKE12/Nuke12.1 -b --nukex %f
+Exec=env QT_SCALE_FACTOR=1.5 /opt/$NUKE12/Nuke12.2 --nukex %f
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
