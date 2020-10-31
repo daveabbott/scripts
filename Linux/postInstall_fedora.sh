@@ -2,6 +2,9 @@
 
 #https://www.shellhacks.com/yes-no-bash-script-prompt-confirmation/
 
+# to set root password run
+# pkexec passwd root
+
 echo -e "set-hostname: double-rabbi"
 hostnamectl set-hostname double-rabbi
 
@@ -9,23 +12,18 @@ read -p "Remove Cruft? [y/N]" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-	dnf remove -y exaile
-	dnf remove -y xawtv
-	dnf remove -y pidgin
-	dnf remove -y parole
-	dnf remove -y xfburn
-	dnf remove -y shotwell
+# remove
 	dnf remove -y libreoffice*
-	dnf remove -y hexchat
-fi
-
-read -p "Install Basics? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
+	dnf remove -y gnome-weather
+	dnf remove -y gnome-weather
+	dnf remove -y gnome-boxes
+	dnf remove -y rhythmbox
+	dnf remove -y cheese
+	dnf remove -y gnome-contacts
+	dnf remove -y firefox
+# install 
 	dnf makecache
 	dnf install -y dnf-utils
-	dnf install -y deltarpm
 	dnf groupinstall -y "Development Tools"
 	dnf install -y kernel-devel kernel-headers
 	dnf install -y dkms
@@ -33,11 +31,53 @@ then
 	dnf update -y
 
 	dnf install -y fedora-workstation-repositories
-	dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-	dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-	sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree.repo
-	sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree-nvidia-driver.repo
-	sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree-updates.repo
+	
+	dnf install -y chrome-gnome-shell # ads gnome support to firefox
+		# gnome extensions
+		# https://extensions.gnome.org/extension/517/caffeine/
+		
+	
+# flatpak
+	# add repo
+	flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+	# install flatpaks
+	flatpak install -y flathub com.bitwarden.desktop
+	flatpak install -y flathub org.mozilla.firefox
+		dnf install chrome-gnome-shell
+	flatpak install -y flathub org.mozilla.Thunderbird
+	flatpak install -y flathub com.slack.Slack
+	flatpak install -y flathub us.zoom.Zoom
+	flatpak install -y flathub fr.handbrake.ghb
+	flatpak install -y flathub com.makemkv.MakeMKV
+	flatpak install -y flathub org.videolan.VLC
+	flatpak install -y flathub com.spotify.Client
+	flatpak install -y flathub org.blender.Blender
+		# folder permisions
+		flatpak override --filesystem=/mnt/DATUMS/SCRATCH/blender org.blender.Blender
+	flatpak install -y flathub fr.natron.Natron
+	flatpak install -y flathub com.rawtherapee.RawTherapee
+	flatpak install -y flathub io.github.RodZill4.Material-Maker
+	flatpak install -y flathub com.quixel.Bridge
+		# folder permisions
+		flatpak override --filesystem=/mnt/kabbalah/library/Stock\ Assets/Megascans\ Library com.quixel.Bridge
+	flatpak install -y flathub com.sublimetext.three
+	flatpak install -y flathub com.sublimemerge.App
+	
+	
+# nvidia
+# https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&target_distro=Fedora&target_version=32&target_type=rpmnetwork
+
+	sudo dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/fedora32/x86_64/cuda-fedora32.repo
+	sudo dnf clean all
+	sudo dnf -y module install nvidia-driver:latest-dkms
+	sudo dnf -y install cuda
+	
+	
+	#dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+	#dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+	#sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree.repo
+	#sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree-nvidia-driver.repo
+	#sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree-updates.repo
 
 	dnf install -y timeshift
 	dnf install -y alacarte						# allow easy changing of app shortcuts
@@ -48,7 +88,7 @@ then
     dnf install -y ffmpeg
 
 	dnf install -y libGLU						# needed for Nuke10.5
-	dnf install -y libusb       				# needed for PFTrack
+	dnf install -y libusb       					# needed for PFTrack
 # turbovnc
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
 	dnf config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
@@ -57,11 +97,6 @@ then
 	rpm --import https://www.virtualgl.org/key/VGL-GPG-KEY
 	dnf config-manager --add-repo=https://virtualgl.org/pmwiki/uploads/Downloads/VirtualGL.repo
 	dnf install -y VirtualGL 
-# spotify
-	dnf config-manager --add-repo=https://negativo17.org/repos/fedora-spotify.repo
-	dnf install -y spotify-client
-# steam
-	dnf install -y steam
 # sublime
     rpm --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
     dnf config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
@@ -97,6 +132,7 @@ then
 	firewall-cmd --zone=public --permanent --add-service=vnc-server
 	firewall-cmd --zone=public --permanent --add-service=https
 	systemctl enable firewalld
+	systemctl restart firewalld
 # wireguard
 	echo "Adding IP Route for Wireguard"
 	echo "192.168.3.0/24 via 192.168.69.30 dev enp6s0" > /etc/sysconfig/network-scripts/route-enp6s0
@@ -108,8 +144,6 @@ then
 	echo "active  -fstype=nfs  192.168.69.20:/volume1/Active" > /etc/auto.kabbalah
 	echo "cloud  -fstype=nfs  192.168.69.20:/volume1/Cloud" >> /etc/auto.kabbalah
 	echo "library  -fstype=nfs  192.168.69.20:/volume1/Library" >> /etc/auto.kabbalah
-	echo "media  -fstype=nfs  192.168.69.20:/volume1/Media" >> /etc/auto.kabbalah
-	echo "temp  -fstype=nfs  192.168.69.20:/volume1/Temp" >> /etc/auto.kabbalah
 # airbag
 	mkdir /mnt/airbag
 	read -p 'Username: ' uservar
