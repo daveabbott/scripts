@@ -2,9 +2,28 @@
 
 #https://www.shellhacks.com/yes-no-bash-script-prompt-confirmation/
 
-# to set root password run
-# pkexec passwd root
+OS_VERSION=$(grep VERSION_ID /etc/os-release | tr -d '"')
+ALLOWED_VERSION=VERSION_ID="33"
 
+if [[ $OS_VERSION != $ALLOWED_VERSION ]]
+then
+	echo Incorrect centos version detected.
+	echo Detected: $OS_VERSION
+	echo Script meant for: $ALLOWED_VERSION
+	exho exiting
+	exit 0
+else
+	echo Fedora 33 detected.
+	echo Proceeding...
+	echo
+
+# set root password
+pkexec passwd root
+
+# switch to root
+su
+
+# set hostname
 echo -e "set-hostname: double-rabbi"
 hostnamectl set-hostname double-rabbi
 
@@ -13,82 +32,143 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 # remove
-	dnf remove -y libreoffice*
-	dnf remove -y gnome-weather
-	dnf remove -y gnome-weather
-	dnf remove -y gnome-boxes
-	dnf remove -y rhythmbox
-	dnf remove -y cheese
-	dnf remove -y gnome-contacts
-	dnf remove -y firefox
+	dnf remove -y \
+	libreoffice* \
+	gnome-weather \
+	gnome-weather \
+	gnome-boxes \
+	rhythmbox \
+	cheese \
+	gnome-contacts \
+	firefox
 # install 
 	dnf makecache
-	dnf install -y dnf-utils
+
+	dnf install -y \
+	dnf-utils \
+	kernel-devel \
+	kernel-headers \
+	dkms
+
 	dnf groupinstall -y "Development Tools"
-	dnf install -y kernel-devel kernel-headers
-	dnf install -y dkms
 
 	dnf update -y
 
-	dnf install -y fedora-workstation-repositories
+	dnf install -y \
+	fedora-workstation-repositories \
+	gnome-tweak-tool \
+	timeshift \
 	
-	dnf install -y chrome-gnome-shell # ads gnome support to firefox
+	# cinnamon
+	dnf install -y \
+	cinnamon \
+	nemo-fileroller
+
+	# THESE ARE NEED FOR PRODUCTION
+	dnf install -y libnsl						# needed for Houdini
+	dnf install -y libGLU						# needed for Nuke
+	dnf install -y libusb						# needed for PFTrack
+
+
+	#dnf install -y chrome-gnome-shell # ads gnome support to firefox
 		# gnome extensions
 		# https://extensions.gnome.org/extension/517/caffeine/
-		
+		# https://extensions.gnome.org/extension/1160/dash-to-panel/
+		# https://extensions.gnome.org/extension/6/applications-menu/	
 	
 # flatpak
 	# add repo
 	flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 	# install flatpaks
-	flatpak install -y flathub com.bitwarden.desktop
-	flatpak install -y flathub org.mozilla.firefox
-		dnf install chrome-gnome-shell
-	flatpak install -y flathub org.mozilla.Thunderbird
-	flatpak install -y flathub com.slack.Slack
-	flatpak install -y flathub us.zoom.Zoom
-	flatpak install -y flathub fr.handbrake.ghb
-	flatpak install -y flathub com.makemkv.MakeMKV
-	flatpak install -y flathub org.videolan.VLC
-	flatpak install -y flathub com.spotify.Client
-	flatpak install -y flathub org.blender.Blender
-		# folder permisions
-		flatpak override --filesystem=/mnt/DATUMS/SCRATCH/blender org.blender.Blender
-	flatpak install -y flathub fr.natron.Natron
-	flatpak install -y flathub com.rawtherapee.RawTherapee
-	flatpak install -y flathub io.github.RodZill4.Material-Maker
-	flatpak install -y flathub com.quixel.Bridge
-		# folder permisions
-		flatpak override --filesystem=/mnt/kabbalah/library/Stock\ Assets/Megascans\ Library com.quixel.Bridge
-	flatpak install -y flathub com.sublimetext.three
-	flatpak install -y flathub com.sublimemerge.App
+	flatpak install -y flathub \
+	com.bitwarden.desktop \
+	org.mozilla.firefox \
+	org.mozilla.Thunderbird \
+	com.slack.Slack \
+	us.zoom.Zoom
+	fr.handbrake.ghb \
+	com.makemkv.MakeMKV \
+	org.blender.Blender \
+	fr.natron.Natron \
+	com.rawtherapee.RawTherapee \
+	io.github.RodZill4.Material-Maker \
+	com.quixel.Bridge \
+	org.videolan.VLC
+	com.spotify.Client
+	com.sublimetext.three \
+	flathub com.sublimemerge.App
 	
+	# folder permisions
+	# blender
+	flatpak override --filesystem=/mnt/DATUMS/SCRATCH/blender org.blender.Blender
+	# quixel
+	flatpak override --filesystem=/mnt/kabbalah/library/Stock\ Assets/Megascans\ Library com.quixel.Bridge
+	
+
+# network settings	
+	dnf install -y firewalld firewall-config
+	dnf install -y samba-client samba-common cifs-utils autofs nfs-utils
+	# firewall settings
+	firewall-cmd --zone=public --permanent --add-port=5900/tcp
+	firewall-cmd --zone=public --permanent --add-service=vnc-server
+	firewall-cmd --zone=public --permanent --add-service=https
+	systemctl enable firewalld
+	systemctl restart firewalld
+	# wireguard
+	echo "Adding IP Route for Wireguard"
+	echo "192.168.3.0/24 via 192.168.69.30 dev enp6s0" > /etc/sysconfig/network-scripts/route-enp6s0
+	echo "192.168.3.0/24 via 192.168.69.30 dev TheInternet" > /etc/sysconfig/network-scripts/route-TheInternet
+	echo "192.168.3.0/24 via 192.168.69.30 dev TheInternet_5GHz" > /etc/sysconfig/network-scripts/route-TheInternet_5GHz
+	# add kabbalah
+	mkdir /mnt/kabbalah
+	echo "/mnt/kabbalah /etc/auto.kabbalah --timeout=60" > /etc/auto.master
+	echo "active  -fstype=nfs  192.168.69.20:/volume1/Active" > /etc/auto.kabbalah
+	echo "cloud  -fstype=nfs  192.168.69.20:/volume1/Cloud" >> /etc/auto.kabbalah
+	echo "library  -fstype=nfs  192.168.69.20:/volume1/Library" >> /etc/auto.kabbalah
+	# autofs
+	systemctl enable autofs
+	systemctl restart autofs
 	
 # nvidia
+	chmod +x /mnt/kabbalah/library/Software/_drivers/Nvidia/NVIDIA*.run
+	
+	dnf install -y kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
+	
+	echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
+	
+	sed -i '/GRUB_CMDLINE_LINUX/c\GRUB_CMDLINE_LINUX="rhgb quiet rd.driver.blacklist=nouveau"' /etc/sysconfig/grub
+
+#GRUB_TIMEOUT=5
+#GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+#GRUB_DEFAULT=saved
+#GRUB_DISABLE_SUBMENU=true
+#GRUB_TERMINAL_OUTPUT="console"
+#GRUB_CMDLINE_LINUX="rhgb quiet"
+#GRUB_DISABLE_RECOVERY="true"
+#GRUB_ENABLE_BLSCFG=true
+
+	dnf remove xorg-x11-drv-nouveau
+
+	dracut /boot/initramfs-$(uname -r).img $(uname -r) --force
+
+
 # https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&target_distro=Fedora&target_version=32&target_type=rpmnetwork
 
 	sudo dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/fedora32/x86_64/cuda-fedora32.repo
 	sudo dnf clean all
 	sudo dnf -y module install nvidia-driver:latest-dkms
 	sudo dnf -y install cuda
-	
-	
-	#dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-	#dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-	#sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree.repo
-	#sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree-nvidia-driver.repo
-	#sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia*' /etc/yum.repos.d/rpmfusion-nonfree-updates.repo
 
-	dnf install -y timeshift
-	dnf install -y alacarte						# allow easy changing of app shortcuts
-	dnf install -y piper						# mouse configurator
-	dnf install -y handbrake-gui
-    dnf install -y blender
-    dnf install -y vlc
-    dnf install -y ffmpeg
+	echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
 
-	dnf install -y libGLU						# needed for Nuke10.5
-	dnf install -y libusb       					# needed for PFTrack
+	grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
+
+	dnf remove xorg-x11-drv-nouveau
+
+	dracut /boot/initramfs-$(uname -r).img $(uname -r) --force
+	
+	systemctl set-default multi-user.target
+
 # turbovnc
 	rpm --import https://www.turbovnc.org/key/VGL-GPG-KEY
 	dnf config-manager --add-repo=https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo
@@ -97,10 +177,6 @@ then
 	rpm --import https://www.virtualgl.org/key/VGL-GPG-KEY
 	dnf config-manager --add-repo=https://virtualgl.org/pmwiki/uploads/Downloads/VirtualGL.repo
 	dnf install -y VirtualGL 
-# sublime
-    rpm --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
-    dnf config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
-    dnf install -y sublime-text
 # wireguard
 	dnf copr enable jdoss/wireguard -y
 	dnf install -y wireguard-dkms wireguard-tools

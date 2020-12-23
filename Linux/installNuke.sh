@@ -17,9 +17,10 @@ elif [ -e /etc/os-release ] ; then
 elif [ -e /etc/some-other-release-file ] ; then
    DISTRO=$(ihavenfihowtohandleotherhypotheticalreleasefiles)
 fi
-
+# make distro lovwer case
 DISTRO=$(printf '%s\n' "$DISTRO" | LC_ALL=C tr '[:upper:]' '[:lower:]')
 
+# set icon path
 case "$DISTRO" in
 	centos*) ICON_PATH="/home/davidabbott/.local/share/applications" ;;
 	fedora*) ICON_PATH="/usr/share/applications" ;;
