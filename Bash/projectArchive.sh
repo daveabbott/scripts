@@ -26,43 +26,50 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
     find . -type d -name '_cache' -delete
     find . -type f -name '*.tmp' -delete
+    find . -path '*/@eaDir*' -delete
+    find . -type f -name '.DS_Store' -delete
+
 fi
 
-# Compress shot folders
+# Compress folders
 echo
 read -p "Compress project files? " -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 
-cd ./shots
-function compressProjects {
-    echo "compressing $1 projects"
-    for sequence in */; do
-
-        echo entering "$sequence"
-        cd $sequence
-
-        for shot in */; do
-            if [ -d "${shot%*/}/$1" ]
-            then
-                7z a -mx=9 ../../_archive/"$sequence""${shot%*/}"/$1 "${shot%*/}"/$1;
-            else
-                echo "$1 doesn't exist";
-            fi
-        done
-
-        cd ./..
-    done
-}
-
-compressProjects "ae"
-compressProjects "blender"
-compressProjects "data"
-compressProjects "houdini"
-compressProjects "mocha"
-compressProjects "nuke"
-
+# input
+cd ./_input
+for dir in *; do
+	cd $dir
+		for datedfolder in *; do
+			7z a -mx=3 $PROJECTPATH/_archive/_input/$dir/$datedfolder.7z $datedfolder;
+		done
+	cd ./..
+done
 cd ./..
+
+# project
+cd ./project
+for dir in *; do
+	7z a -mx=9 $PROJECTPATH/_archive/project/$dir.7z $dir;
+done
+cd ./..
+
+# shots
+cd ./shots
+for sequence in *; do
+    cd $sequence
+	for shot in *; do
+		cd $shot
+			for subfolder in *; do
+                7z a -mx=9 $PROJECTPATH/_archive/shots/$sequence/$shot/$subfolder.7z $subfolder;
+            done
+        cd ./..
+        done
+    cd ./..
+done
+cd ./..
+
 fi
 
 # Update metadata file

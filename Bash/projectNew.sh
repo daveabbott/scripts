@@ -31,7 +31,7 @@ mkdir -p ./_input/{fromClient/$(date +"%y%m%d"),fromGrade/$(date +"%y%m%d")}
 mkdir -p ./_cache/{houdini,nuke/{EXR/{denoise,smartVectors},JPG/{denoise}},redshift}
 mkdir -p ./_renders/{ae,houdini,mocha,nuke,resolve}
 mkdir -p ./assets/{audio,images,fonts,graphics,hdri,models,maps,video,reference,rushes,xml}
-mkdir -p ./project/{meshroom,pftrack,photoshop,premiere,resolve}
+mkdir -p ./project/{meshroom,pftrack,photoshop,premiere,resolve,studio}
 mkdir -p ./shots/"$JOBCODE"_{A..E}
 
 # create shot folder within each sequence
