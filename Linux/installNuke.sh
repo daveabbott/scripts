@@ -1,13 +1,8 @@
 #!/bin/sh
 
-
-
 REPO_PATH="/mnt/kabbalah/library/Software"
 
-
-
 NUKE_DEST="/opt/Nuke"
-
 
 # get OS name
 if type lsb_release >/dev/null 2>&1 ; then
@@ -132,3 +127,13 @@ exit 0
 # Type=Application
 # Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 # EOF
+
+
+# Nuke 10.5 on Fedora
+#NUKE10="/mnt/kabbalah/library/Software/Linux/Foundry/Nuke-10.5*.run"
+#cp $NUKE10 /opt
+#chmod +x /opt/Nuke-10.5*.run
+#mkdir /opt/Nuke10.5v4 && cd $_
+#unzip /opt/Nuke-10.5*.run
+#cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libGLU.so.1.3.1 /lib64
+#cp /mnt/kabbalah/library/Software/Linux/Foundry/Nuke10.5/libidn.so.11 /opt/Nuke10.5v4

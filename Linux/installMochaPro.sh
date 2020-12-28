@@ -17,4 +17,6 @@ cat > /usr/share/mime/packages/project-mocha-script.xml << EOF
 </mime-info>
 EOF
 
+update-mime-database /usr/share/mime
+
 exit 0
