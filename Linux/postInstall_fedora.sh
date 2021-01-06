@@ -178,18 +178,13 @@ then
 # virtualbox
 	dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
 	dnf install -y VirtualBox-6.0.x86_64
-# makemkv
-	dnf config-manager --add-repo=https://negativo17.org/repos/fedora-multimedia.repo
-	sed -i '/repo_gpgcheck=0/a exclude=*cuda* *nvidia* *ffmpeg* *gstreamer* *HandBrake* *live555* x264-libs x265-libs *vlc*' /etc/yum.repos.d/fedora-multimedia.repo # this prevents clashes with RPMFusion
-	dnf install -y makemkv libdvdcss
-	echo "T-UWwbYn781f1gjZcH5NOsJkGgWHnUkQsr2IduoSJ8sssNXOqclsWhowNWTclkBjHIMH" > /makemkv-betakey.txt
 # cuda
-	dnf config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/fedora29/x86_64/cuda-fedora29.repo
-	dnf --disablerepo="rpmfusion-nonfree*" install cuda
-	echo "blacklist nouveau" > /usr/lib/modprobe.d/blacklist-nouveau.conf
-	echo "options nouveau modeset=0" >> /usr/lib/modprobe.d/blacklist-nouveau.conf
-	dracut --force
-	grub2-mkconfig -o /boot/grub2/grub.cfg
+# 	dnf config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/fedora29/x86_64/cuda-fedora29.repo
+# 	dnf --disablerepo="rpmfusion-nonfree*" install cuda
+# 	echo "blacklist nouveau" > /usr/lib/modprobe.d/blacklist-nouveau.conf
+# 	echo "options nouveau modeset=0" >> /usr/lib/modprobe.d/blacklist-nouveau.conf
+# 	dracut --force
+# 	grub2-mkconfig -o /boot/grub2/grub.cfg
 fi
 
 read -p "Install Network? " -n 1 -r
