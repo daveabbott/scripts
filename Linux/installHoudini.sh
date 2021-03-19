@@ -2,7 +2,7 @@
 
 REPO_PATH="/mnt/kabbalah/library/Software"
 
-# install nuke
+# install houdini
 cd /tmp
 
 tar -xvf $REPO_PATH/Houdini/houdini*linux*.tar.gz
