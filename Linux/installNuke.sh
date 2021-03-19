@@ -1,6 +1,7 @@
 #!/bin/sh
 
 REPO_PATH="/mnt/kabbalah/library/Software"
+NUKE_PATH="$REPO_PATH/Nuke/Current/"
 
 NUKE_DEST="/opt/Nuke"
 
@@ -12,66 +13,100 @@ elif [ -e /etc/os-release ] ; then
 elif [ -e /etc/some-other-release-file ] ; then
    DISTRO=$(ihavenfihowtohandleotherhypotheticalreleasefiles)
 fi
-# make distro lovwer case
+
+# make distro lower case
 DISTRO=$(printf '%s\n' "$DISTRO" | LC_ALL=C tr '[:upper:]' '[:lower:]')
 
 # set icon path
-case "$DISTRO" in
-	centos*) ICON_PATH="/home/davidabbott/.local/share/applications" ;;
-	fedora*) ICON_PATH="/usr/share/applications" ;;
-esac
+ case "$DISTRO" in
+ 	centos*) ICON_PATH="/home/davidabbott/.local/share/applications" ;; # this can't be $HOME as script must run as root
+ 	fedora*) ICON_PATH="/usr/share/applications" ;;
+ esac
 
-# remove old nuke install
+# remove old nuke installs
 touch $NUKE_DEST	# this step prevents rm from erroring if the dir doesnt exist yet
 rm -rf $NUKE_DEST
+mkdir $NUKE_DEST
 
-# install nuke
-NUKE_RUN="$REPO_PATH/Nuke/Current/Nuke*.run"
-chmod +x $NUKE_RUN
-mkdir $NUKE_DEST && cd $_
-$NUKE_RUN --accept-foundry-eula
+# install nuke(s)
+cd $NUKE_PATH
+for f in *.run ; do # this will ignore any non run files. useful if mac installers live in same directory
+	NUKE_INSTALLER=${f%*/}
+	chmod +x $NUKE_PATH/$NUKE_INSTALLER
+	cd $NUKE_DEST
+	$NUKE_PATH/$NUKE_INSTALLER --accept-foundry-eula
+	cd $NUKE_PATH
+done
 
-# find nuke binary
-NUKE_BIN=$(find -maxdepth 2 -name "Nuke*" -executable -type f)
-# find nuke version number
-NUKE_VERSION=$(find -maxdepth 1 -name "Nuke*" -type d)
+# remove icons
+rm -rf $ICON_PATH/Nuke*.desktop
 
-# create shortcuts
-cat > $ICON_PATH/Nuke.desktop <<EOF
+# create icons
+# check for installed versions
+cd $NUKE_DEST
+for dir in */ ; do
+	NUKE_VER=${dir%*/}
+	
+	# decend into sub folder and find binary
+	cd ./$NUKE_VER
+	NUKE_BIN=$(find -maxdepth 2 -name "Nuke*" -executable -type f)
+
+	# split release and version number off of dir
+	delimiter="Nuke"
+	s=$NUKE_VER$delimiter
+	array=();
+	while [[ $s ]]; do
+    	array+=( "${s%%"$delimiter"*}" );
+    	s=${s#*"$delimiter"};
+	done;
+	declare -a array
+
+	# print version number
+	echo Nuke version ${array[1]} installed
+
+	# return up a level
+	cd ./..
+
+# nuke-standard
+cat > $ICON_PATH/Nuke${array[1]}.desktop <<EOF
 [Desktop Entry]
-Name=Nuke
-Exec=env QT_SCALE_FACTOR=1.5 $NUKE_DEST/$NUKE_BIN
+Name=Nuke${array[1]}
+Exec=env QT_SCALE_FACTOR=1.5 $NUKE_DEST/$NUKE_VER/$NUKE_BIN
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
-Icon=$NUKE_DEST/$NUKE_VERSION/plugins/icons/NukeApp48.png
+Icon=$NUKE_DEST/$NUKE_VER/plugins/icons/NukeApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
-cat > $ICON_PATH/NukeX.desktop <<EOF
+# nuke-x
+cat > $ICON_PATH/NukeX${array[1]}.desktop <<EOF
 [Desktop Entry]
-Name=NukeX
-Exec=env QT_SCALE_FACTOR=1.5 $NUKE_DEST/$NUKE_BIN --nukex %f
+Name=NukeX${array[1]}
+Exec=env QT_SCALE_FACTOR=1.5 $NUKE_DEST/$NUKE_VER/$NUKE_BIN --nukex %f
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
-Icon=$NUKE_DEST/$NUKE_VERSION/plugins/icons/NukeXApp48.png
+Icon=$NUKE_DEST/$NUKE_VER/plugins/icons/NukeXApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
 
-cat > $ICON_PATH/NukeStudio.desktop <<EOF
+# nuke-studio
+cat > $ICON_PATH/NukeStudio${array[1]}.desktop <<EOF
 [Desktop Entry]
-Name=NukeStudio
-Exec=env QT_SCALE_FACTOR=1.5 $NUKE_DEST/$NUKE_BIN --studio %f
+Name=NukeStudio${array[1]}
+Exec=env QT_SCALE_FACTOR=1.5 $NUKE_DEST/$NUKE_VER/$NUKE_BIN --studio %f
 Comment=
 Terminal=true
 MimeType=application/x-nuke;
-Icon=$NUKE_DEST/$NUKE_VERSION/plugins/icons/NukeStudioApp48.png
+Icon=$NUKE_DEST/$NUKE_VER/plugins/icons/NukeStudioApp48.png
 Type=Application
 Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
 EOF
+
+done
 
 # set mimetype for .nk
 cat > /usr/share/mime/packages/project-nuke-script.xml << EOF
@@ -97,36 +132,6 @@ echo "HOST 192.168.69.4 any 4101" > $RLM/ethernet.lic
 
 exit 0
 
-# .desktop for pre 12.1
-
-# NUKE_RUN="$REPO_PATH/Nuke/Nuke11.3/Nuke-11.3*.run"
-# chmod +x $NUKE_RUN
-# mkdir /opt/$NUKE11 && cd $_
-# unzip $NUKE_RUN
-
-# cat > $ICON_PATH/Nuke$NUKE10.desktop <<EOF
-# [Desktop Entry]
-# Name=Nuke$NUKE10
-# Comment=
-# Exec=/opt/Nuke$NUKE10/Nuke10.5 -q
-# Terminal=true
-# MimeType=application/x-nuke;
-# Icon=/opt/Nuke$NUKE10/plugins/icons/NukeApp48.png
-# Type=Application
-# Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
-# EOF
-
-# cat > $ICON_PATH/NukeX$NUKE10.desktop <<EOF
-# [Desktop Entry]
-# Name=NukeX$NUKE10
-# Comment=
-# Exec=/opt/Nuke$NUKE10/Nuke10.5 -q --nukex
-# Terminal=true
-# MimeType=application/x-nuke;
-# Icon=/opt/Nuke$NUKE10/plugins/icons/NukeXApp48.png
-# Type=Application
-# Categories=Graphics;2DGraphics;RasterGraphics;FLTK;
-# EOF
 
 
 # Nuke 10.5 on Fedora
