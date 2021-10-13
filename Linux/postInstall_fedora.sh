@@ -13,7 +13,7 @@ then
 	exho exiting
 	exit 0
 else
-	echo Fedora 33 detected.
+	echo Fedora detected.
 	echo Proceeding...
 	echo
 
@@ -27,6 +27,11 @@ su
 echo -e "set-hostname: double-rabbi"
 hostnamectl set-hostname double-rabbi
 
+# enable wake on lan
+su ethtool -s enp6s0 wol g
+echo 'ETHTOOL_OPTS="wol g"' > /etc/sysconfig/network-scripts/ifcfg-enp6s0
+
+# uninstall junk
 read -p "Remove Cruft? [y/N]" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
@@ -57,25 +62,27 @@ fi
 	dnf -y update
 
 	dnf -y install \
-	fedora-workstation-repositories \
 	gnome-tweak-tool \
 	timeshift \
-	p7zip-plugins
+	p7zip-plugins \
+	ffmpeg
+
 	
-	# cinnamon
-	dnf -y install \
-	cinnamon \
-	nemo-fileroller
+	# wireguard
+	dnf install -y wireguard-tools
+
+	dnf install youtube-dl		# for downloading youtube videos
+	dnf install ImageMagick		# for converting webp files etc
+	dnf install vdpauinfo libva-vdpau-driver libva-utils # GPU acceralted video playback
+
 
 	# THESE ARE NEEDED FOR PRODUCTION
 	dnf -y install libnsl			# needed for Houdini
 	dnf -y install libGLU			# needed for Nuke
 	dnf -y install libusb			# needed for PFTrack
-	dnf -y install linpng15			# needed for redshift license
-	
-	# GitHub CLI
-	sudo -y dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
-	sudo -y dnf install gh
+	dnf -y install libpng15			# needed for redshift license
+	dnf -y install python2-numpy	# need for macbeth matching in Nuke
+
 
 # flatpak
 	# add repo
@@ -97,7 +104,10 @@ fi
 	org.videolan.VLC \
 	com.spotify.Client \
 	com.sublimetext.three \
-	org.darktable.Darktable
+	org.darktable.Darktable \
+	net.sourceforge.qtpfsgui.LuminanceHDR \
+	org.gnome.Extensions \
+	com.rafaelmardojai.Blanket
 	
 	# folder permisions
 	# blender
@@ -110,9 +120,18 @@ fi
 	# rdarktable
 	flatpak override --filesystem=/mnt/kabbalah/library org.darktable.Darktable
 
+# gnome settings
+	# disable hot corners
+	gsettings set org.gnome.desktop.interface enable-hot-corners false
+
+
 # network settings	
-	dnf -y install firewalld firewall-config
-	dnf -y install samba-client samba-common cifs-utils autofs nfs-utils
+	dnf -y install \
+	firewalld firewall-config \
+	samba-client samba-common \
+	cifs-utils \
+	autofs \
+	nfs-utils
 	# firewall settings
 	firewall-cmd --zone=public --permanent --add-port=5900/tcp
 	firewall-cmd --zone=public --permanent --add-service=vnc-server
@@ -133,54 +152,34 @@ fi
 	echo "repos  -fstype=nfs  192.168.69.20:/volume1/Repositories" >> /etc/auto.kabbalah
 	# add airbag
 	mkdir /mnt/airbag
-	read -p 'Username: ' uservar
-	read -sp 'Password: ' passvar
-	echo "username=$uservar" > /etc/pwd_airbag.txt
-	echo "password=$passvar" >> /etc/pwd_airbag.txt
-	unset uservar passvar
-	echo "/mnt/airbag /etc/auto.airbag --timeout=60" >> /etc/auto.master
-	echo "LDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/LDRIVE" > /etc/auto.airbag
-	echo "SDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/SDRIVE" >> /etc/auto.airbag
+	#read -p 'Username: ' uservar
+	#read -sp 'Password: ' passvar
+	#echo "username=$uservar" > /etc/pwd_airbag.txt
+	#echo "password=$passvar" >> /etc/pwd_airbag.txt
+	#unset uservar passvar
+	#echo "/mnt/airbag /etc/auto.airbag --timeout=60" >> /etc/auto.master
+	#echo "LDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/LDRIVE" > /etc/auto.airbag
+	#echo "SDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/SDRIVE" >> /etc/auto.airbag
 	# add pixel
 	mkdir /mnt/pixel
-	read -p 'Username: ' uservar
-	read -sp 'Password: ' passvar
-	echo "username=$uservar" > /etc/pwd_pixel.txt
-	echo "password=$passvar" >> /etc/pwd_pixel.txt
-	unset uservar passvar
-	echo "/mnt/pixel /etc/auto.pixel --timeout=60" >> /etc/auto.master
-	echo "MegaRAID  -fstype=cifs,rw,noperm,credentials=/etc/pwd_pixel.txt  ://MegaRAID/MegaRAID" > /etc/auto.pixel
+	#read -p 'Username: ' uservar
+	#read -sp 'Password: ' passvar
+	#echo "username=$uservar" > /etc/pwd_pixel.txt
+	#echo "password=$passvar" >> /etc/pwd_pixel.txt
+	#unset uservar passvar
+	echo "/mnt/megaraid /etc/auto.pixel --timeout=60" >> /etc/auto.master
+	echo "active  -fstype=afp afp://pixel:osiris23@192.168.1.124/MegaRAID/_ACTIVE" > /etc/auto.pixel
 
 	# autofs
 	systemctl enable autofs
 	systemctl restart autofs
 
-# nvidia
-	chmod +x /mnt/kabbalah/library/Software/_drivers/Nvidia/NVIDIA*.run
-	
-	dnf -y install \
-	acpid \
-	dkms \
-	gcc \
-	kernel-devel \
-	kernel-headers \
-	libglvnd-glx \
-	libglvnd-opengl \
-	libglvnd-devel \
-	make \
-	pkgconfig
-
-	dnf -y config-manager --add-repo \
-	https://developer.download.nvidia.com/compute/cuda/repos/fedora33/x86_64/cuda-fedora33.repo
-
-	dnf clean all
-
-	dnf -y module install nvidia-driver:latest-dkms
-
-	dnf -y install cuda
-
-# wireguard
-#	dnf copr enable jdoss/wireguard -y
-#	dnf install -y wireguard-dkms wireguard-tools
-
 exit 0
+
+# nvidia
+	#dnf install \
+	#https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+	#https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+	#dnf install -y akmod-nvidia
+	#dnf install -y xorg-x11-drv-nvidia-cuda
