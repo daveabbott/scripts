@@ -1,7 +1,8 @@
 #!/bin/sh
 
 REPO_PATH="/mnt/kabbalah/library/Software"
-PFTRACK_PATH="$REPO_PATH/PixelFarm/"
+
+PFTRACK_PATH="$REPO_PATH/PFTrack/"
 
 # get OS name
 if type lsb_release >/dev/null 2>&1 ; then
@@ -22,7 +23,7 @@ DISTRO=$(printf '%s\n' "$DISTRO" | LC_ALL=C tr '[:upper:]' '[:lower:]')
  esac
 
 # install
-$INST install -y '$PFTRACK_PATH/pftrack-2016.24.29-1.x86_64.rpm'
-$INST install -y '$PFTRACK_PATH/pfmanager-2018.13.28-1.x86_64.rpm'
+$INST install -y $PFTRACK_PATH/pftrack*.rpm
+$INST install -y $PFTRACK_PATH/pfmanager*.rpm
 
 exit 0
