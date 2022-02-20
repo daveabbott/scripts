@@ -130,6 +130,23 @@ echo "HOST 192.168.69.2 any 4101" > $RLM/wifi.lic
 echo "HOST 192.168.3.2 any 4101" > $RLM/wireguard.lic
 echo "HOST 192.168.69.4 any 4101" > $RLM/ethernet.lic
 
+# install FLU
+
+
+
+# make the dir for the tools to copy into. -p creates all dirs in the chain
+mkdir -p /usr/local/foundry/LicensingTools8.0/bin/RLM
+
+dnf install $NUKE_PATH/../FoundryLicensingUtility*.rpm
+
+# copy these files and then run the FLU and start the server
+sudo cp /opt/FoundryLicensingUtility/bin/rlm.foundry /usr/local/foundry/LicensingTools8.0/bin/RLM/rlm.foundry
+sudo cp /opt/FoundryLicensingUtility/bin/rlmutil /usr/local/foundry/LicensingTools8.0/bin/RLM/rlmutil
+sudo cp /opt/FoundryLicensingUtility/bin/foundry.set /usr/local/foundry/LicensingTools8.0/bin/RLM/foundry.set
+sudo cp /opt/FoundryLicensingUtility/bin/foundryrlmserver /etc/init.d/foundryrlmserver
+
+chkconfig --add foundryrlmserver
+
 exit 0
 
 
