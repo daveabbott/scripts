@@ -3,7 +3,7 @@
 #https://www.shellhacks.com/yes-no-bash-script-prompt-confirmation/
 
 OS_VERSION=$(grep VERSION_ID /etc/os-release | tr -d '"')
-ALLOWED_VERSION=VERSION_ID="33"
+ALLOWED_VERSION=VERSION_ID="35"
 
 if [[ $OS_VERSION != $ALLOWED_VERSION ]]
 then
@@ -28,7 +28,7 @@ echo -e "set-hostname: double-rabbi"
 hostnamectl set-hostname double-rabbi
 
 # enable wake on lan
-su ethtool -s enp6s0 wol g
+ethtool -s enp6s0 wol g
 echo 'ETHTOOL_OPTS="wol g"' > /etc/sysconfig/network-scripts/ifcfg-enp6s0
 
 # uninstall junk
@@ -44,8 +44,8 @@ then
 	gnome-boxes \
 	rhythmbox \
 	cheese \
-	gnome-contacts \
-	firefox
+	gnome-contacts
+	#firefox
 fi
 
 # install 
@@ -61,28 +61,48 @@ fi
 
 	dnf -y update
 
+	dnf install \
+	https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+	https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
 	dnf -y install \
-	gnome-tweak-tool \
 	timeshift \
 	p7zip-plugins \
-	ffmpeg
+	ffmpeg \
+	file-roller
+	gnome-tweak-tool
+
 
 	
 	# wireguard
 	dnf install -y wireguard-tools
 
-	dnf install youtube-dl		# for downloading youtube videos
-	dnf install ImageMagick		# for converting webp files etc
+	dnf -y install youtube-dl		# for downloading youtube videos
+	# dnf -yinstall ImageMagick		# for converting webp files etc
+	dnf -y install OpenImageIO
 	dnf install vdpauinfo libva-vdpau-driver libva-utils # GPU acceralted video playback
 
 
-	# THESE ARE NEEDED FOR PRODUCTION
-	dnf -y install libnsl			# needed for Houdini
-	dnf -y install libGLU			# needed for Nuke
-	dnf -y install libusb			# needed for PFTrack
-	dnf -y install libpng15			# needed for redshift license
-	dnf -y install python2-numpy	# need for macbeth matching in Nuke
+	# sublime
+	rpm -v --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
+	dnf config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
+	dnf -y install sublime-text
 
+	#
+	# THESE ARE NEEDED FOR PRODUCTION
+	#
+	# Houdini
+	dnf -y install libnsl
+	dnf -y install redhat-lsb # for H19
+	# Nuke
+	dnf -y install libGLU
+	dnf -y install python2-numpy # for macbeth chart
+	dnf -y install http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/GConf2-3.2.6-22.el8.x86_64.rpm # for FLU
+	dnf -y install http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/compat-openssl10-1.0.2o-3.el8.x86_64.rpm # for Optical Flares
+	# PFTrack
+	dnf -y install libusb
+	# Redshift License Tool
+	dnf -y install libpng15
 
 # flatpak
 	# add repo
@@ -103,7 +123,6 @@ fi
 	com.quixel.Bridge \
 	org.videolan.VLC \
 	com.spotify.Client \
-	com.sublimetext.three \
 	org.darktable.Darktable \
 	net.sourceforge.qtpfsgui.LuminanceHDR \
 	org.gnome.Extensions \
@@ -146,12 +165,12 @@ fi
 	# add kabbalah
 	mkdir /mnt/kabbalah
 	echo "/mnt/kabbalah /etc/auto.kabbalah --timeout=60" > /etc/auto.master
-	echo "active  -fstype=nfs  192.168.69.20:/volume1/Active" > /etc/auto.kabbalah
-	echo "cloud  -fstype=nfs  192.168.69.20:/volume1/Cloud" >> /etc/auto.kabbalah
-	echo "library  -fstype=nfs  192.168.69.20:/volume1/Library" >> /etc/auto.kabbalah
-	echo "repos  -fstype=nfs  192.168.69.20:/volume1/Repositories" >> /etc/auto.kabbalah
+	echo "active  -fstype=cifs,rw,noperm,vers=3.0,credentials=/etc/.credentials-kabbalah.txt  ://kabbalah/Active/" > /etc/auto.kabbalah
+	echo "cloud   -fstype=cifs,rw,noperm,vers=3.0,credentials=/etc/.credentials-kabbalah.txt  ://kabbalah/Cloud/" >> /etc/auto.kabbalah
+	echo "library -fstype=cifs,rw,noperm,vers=3.0,credentials=/etc/.credentials-kabbalah.txt  ://kabbalah/Library/" >> /etc/auto.kabbalah
+	echo "repos   -fstype=cifs,rw,noperm,vers=3.0,credentials=/etc/.credentials-kabbalah.txt  ://kabbalah/Repositories/" >> /etc/auto.kabbalah
 	# add airbag
-	mkdir /mnt/airbag
+	#mkdir /mnt/airbag
 	#read -p 'Username: ' uservar
 	#read -sp 'Password: ' passvar
 	#echo "username=$uservar" > /etc/pwd_airbag.txt
@@ -161,25 +180,28 @@ fi
 	#echo "LDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/LDRIVE" > /etc/auto.airbag
 	#echo "SDRIVE  -fstype=cifs,rw,noperm,credentials=/etc/pwd_airbag.txt  ://L-ABProjects/SDRIVE" >> /etc/auto.airbag
 	# add pixel
-	mkdir /mnt/pixel
+	#mkdir /mnt/pixel
 	#read -p 'Username: ' uservar
 	#read -sp 'Password: ' passvar
 	#echo "username=$uservar" > /etc/pwd_pixel.txt
 	#echo "password=$passvar" >> /etc/pwd_pixel.txt
 	#unset uservar passvar
-	echo "/mnt/megaraid /etc/auto.pixel --timeout=60" >> /etc/auto.master
-	echo "active  -fstype=afp afp://pixel:osiris23@192.168.1.124/MegaRAID/_ACTIVE" > /etc/auto.pixel
+	#echo "/mnt/megaraid /etc/auto.pixel --timeout=60" >> /etc/auto.master
+	#echo "active  -fstype=afp afp://pixel:osiris23@192.168.1.124/MegaRAID/_ACTIVE" > /etc/auto.pixel
 
 	# autofs
 	systemctl enable autofs
 	systemctl restart autofs
 
-exit 0
-
 # nvidia
-	#dnf install \
-	#https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-	#https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+	dnf install -y dnf-plugins-core
+	
+	dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+	dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
-	#dnf install -y akmod-nvidia
-	#dnf install -y xorg-x11-drv-nvidia-cuda
+	dnf update
+
+	dnf install -y akmod-nvidia
+	dnf install -y xorg-x11-drv-nvidia-cuda
+
+exit 0
