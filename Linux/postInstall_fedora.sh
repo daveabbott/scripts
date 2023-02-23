@@ -99,6 +99,7 @@ fi
 	dnf -y install python2-numpy # for macbeth chart
 	dnf -y install http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/GConf2-3.2.6-22.el8.x86_64.rpm # for FLU
 	dnf -y install http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/compat-openssl10-1.0.2o-3.el8.x86_64.rpm # for Optical Flares
+	dnf -y install https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/36/Everything/x86_64/os/Packages/l/libffi3.1-3.1-32.fc36.x86_64.rpm #libffi for Nuke
 	# PFTrack
 	dnf -y install libusb
 	# Redshift License Tool
