@@ -3,7 +3,9 @@
 REPO_PATH="/mnt/kabbalah/library/Software"
 NUKE_PATH="$REPO_PATH/Nuke/Current/"
 
-NUKE_DEST="/opt/Nuke"
+NUKE_DEST="/mnt/DATUMS/opt/Nuke"
+
+ICON_PATH="/home/davidabbott/.local/share/applications"
 
 # get OS name
 if type lsb_release >/dev/null 2>&1 ; then
@@ -16,12 +18,6 @@ fi
 
 # make distro lower case
 DISTRO=$(printf '%s\n' "$DISTRO" | LC_ALL=C tr '[:upper:]' '[:lower:]')
-
-# set icon path
- case "$DISTRO" in
- 	centos*) ICON_PATH="/home/davidabbott/.local/share/applications" ;; # this can't be $HOME as script must run as root
- 	fedora*) ICON_PATH="/usr/share/applications" ;;
- esac
 
 # remove old nuke installs
 touch $NUKE_DEST	# this step prevents rm from erroring if the dir doesnt exist yet
